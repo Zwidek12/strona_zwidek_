@@ -11,7 +11,7 @@ const PORTRAIT_SRC = '/portret.jfif'
 
 function CenterPortrait(): ReactElement {
   return (
-    <div className="flex min-h-0 flex-1 flex-col items-center justify-center px-4 py-6">
+    <div className="flex shrink-0 flex-col items-center justify-center px-4 py-4 sm:min-h-0 sm:flex-1 sm:py-6">
       <div
         className="relative p-[10px] sm:p-[12px]"
         style={{
@@ -84,7 +84,7 @@ export function StardewScene(): ReactElement {
 
   return (
     <div
-      className="relative flex min-h-dvh w-full flex-1 flex-col overflow-x-hidden overflow-y-auto overscroll-y-contain bg-[#2a1810] font-pixel-pl text-[#3c2a1e] pt-[env(safe-area-inset-top,0px)] pb-[max(0.75rem,env(safe-area-inset-bottom,0px))] pl-[max(0.75rem,env(safe-area-inset-left,0px))] pr-[max(0.75rem,env(safe-area-inset-right,0px))]"
+      className="relative flex w-full min-h-dvh flex-col overflow-x-hidden overscroll-y-auto bg-[#2a1810] font-pixel-pl text-[#3c2a1e] pt-[env(safe-area-inset-top,0px)] pb-[max(0.75rem,env(safe-area-inset-bottom,0px))] pl-[max(0.75rem,env(safe-area-inset-left,0px))] pr-[max(0.75rem,env(safe-area-inset-right,0px))] sm:min-h-0 sm:flex-1 sm:overflow-y-auto sm:overscroll-y-contain"
     >
       <PastoralBackdrop />
 
@@ -92,10 +92,10 @@ export function StardewScene(): ReactElement {
 
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black/45 to-transparent" />
 
-      <div className="relative z-10 flex min-h-0 flex-1 flex-col">
+      <div className="relative z-10 flex flex-col sm:min-h-0 sm:flex-1">
         <CenterPortrait />
 
-        <div className="p-3 sm:p-6">
+        <div className="shrink-0 p-3 sm:p-6">
           <div className="mx-auto max-w-3xl border-4 border-[#5c3a21] bg-[#f5e6c8] p-4 shadow-[8px_8px_0_#2a1a0f] sm:p-5">
             <div className="min-h-[14rem] border-4 border-[#c49a6c] bg-[#fff3d6] p-3 sm:min-h-[15rem] sm:p-4">
               <p className="text-left text-[15px] leading-snug tracking-normal sm:text-[16px]">
