@@ -150,16 +150,17 @@ export function PixelCalendar({ onClose }: PixelCalendarProps): ReactElement {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/55 p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/55 p-3 pt-[max(0.75rem,env(safe-area-inset-top,0px))] pb-[max(0.75rem,env(safe-area-inset-bottom,0px))] pl-[max(0.75rem,env(safe-area-inset-left,0px))] pr-[max(0.75rem,env(safe-area-inset-right,0px))] sm:p-4"
       role="dialog"
       aria-modal="true"
       aria-labelledby="calendar-title"
     >
-      <div className="w-full max-w-sm border-4 border-[#5c3a21] bg-[#f5e6c8] p-4 text-[#3c2a1e] shadow-[8px_8px_0_#2a1a0f]">
+      <div className="flex max-h-[min(92dvh,92svh)] w-full max-w-sm flex-col overflow-hidden border-4 border-[#5c3a21] bg-[#f5e6c8] text-[#3c2a1e] shadow-[8px_8px_0_#2a1a0f]">
+        <div className="min-h-0 overflow-y-auto overscroll-y-contain p-4 [-webkit-overflow-scrolling:touch]">
         <div className="mb-3 flex items-center justify-between gap-2">
           <button
             type="button"
-            className="cursor-pointer border-4 border-[#5c3a21] bg-[#e8cfa6] px-2 py-1 text-[14px] leading-none text-[#3c2a1e] shadow-[inset_1px_1px_0_#fff6dc]"
+            className="touch-manipulation flex min-h-11 min-w-11 shrink-0 cursor-pointer items-center justify-center border-4 border-[#5c3a21] bg-[#e8cfa6] px-2 py-2 text-[16px] leading-none text-[#3c2a1e] shadow-[inset_1px_1px_0_#fff6dc]"
             onClick={() => {
               shiftMonth(-1)
             }}
@@ -169,13 +170,13 @@ export function PixelCalendar({ onClose }: PixelCalendarProps): ReactElement {
           </button>
           <h2
             id="calendar-title"
-            className="text-center text-[14px] uppercase leading-tight tracking-normal sm:text-[15px]"
+            className="min-w-0 flex-1 text-center text-[14px] uppercase leading-tight tracking-normal sm:text-[15px]"
           >
             {title}
           </h2>
           <button
             type="button"
-            className="cursor-pointer border-4 border-[#5c3a21] bg-[#e8cfa6] px-2 py-1 text-[14px] leading-none text-[#3c2a1e] shadow-[inset_1px_1px_0_#fff6dc]"
+            className="touch-manipulation flex min-h-11 min-w-11 shrink-0 cursor-pointer items-center justify-center border-4 border-[#5c3a21] bg-[#e8cfa6] px-2 py-2 text-[16px] leading-none text-[#3c2a1e] shadow-[inset_1px_1px_0_#fff6dc]"
             onClick={() => {
               shiftMonth(1)
             }}
@@ -206,7 +207,7 @@ export function PixelCalendar({ onClose }: PixelCalendarProps): ReactElement {
                 aria-label={`Wybierz ${cell.date.toLocaleDateString('pl-PL')}`}
                 aria-pressed={isSelected}
                 className={[
-                  'flex aspect-square cursor-pointer items-center justify-center border-2 border-[#c49a6c] bg-[#fff3d6] leading-none transition-colors hover:bg-[#ffe8b8] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#5c3a21]',
+                  'touch-manipulation flex aspect-square min-h-[2.75rem] min-w-0 cursor-pointer items-center justify-center border-2 border-[#c49a6c] bg-[#fff3d6] leading-none transition-colors hover:bg-[#ffe8b8] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#5c3a21] active:bg-[#ffe0a0]',
                   cell.isCurrentMonth ? 'text-[#3c2a1e]' : 'text-[#a08066]',
                   cell.isToday ? 'ring-2 ring-[#d95763] ring-offset-1 ring-offset-[#f5e6c8]' : '',
                   isSelected ? 'bg-[#c8e6a0] ring-2 ring-[#5c8c2a] ring-offset-1 ring-offset-[#f5e6c8]' : '',
@@ -233,7 +234,7 @@ export function PixelCalendar({ onClose }: PixelCalendarProps): ReactElement {
         </label>
         <textarea
           id="proposal-note"
-          className="mt-1 w-full resize-y border-4 border-[#c49a6c] bg-[#fff3d6] p-2 text-[14px] text-[#3c2a1e] placeholder:text-[#a08066] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#5c3a21]"
+          className="mt-1 w-full resize-y border-4 border-[#c49a6c] bg-[#fff3d6] p-2 text-[16px] text-[#3c2a1e] placeholder:text-[#a08066] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#5c3a21] sm:text-[14px]"
           rows={3}
           maxLength={2000}
           value={note}
@@ -258,7 +259,7 @@ export function PixelCalendar({ onClose }: PixelCalendarProps): ReactElement {
         <div className="mt-3 flex flex-wrap justify-end gap-2">
           <button
             type="button"
-            className="cursor-pointer border-4 border-[#5c3a21] bg-[#c8e6a0] px-3 py-2 text-[14px] text-[#1e3d0f] shadow-[inset_2px_2px_0_#e8ffd0,inset_-2px_-2px_0_#7aab55] disabled:cursor-not-allowed disabled:opacity-50 sm:text-[15px]"
+            className="touch-manipulation min-h-11 cursor-pointer border-4 border-[#5c3a21] bg-[#c8e6a0] px-3 py-2.5 text-[14px] text-[#1e3d0f] shadow-[inset_2px_2px_0_#e8ffd0,inset_-2px_-2px_0_#7aab55] disabled:cursor-not-allowed disabled:opacity-50 sm:text-[15px]"
             disabled={selected === null || submitStatus === 'loading' || submitStatus === 'success'}
             onClick={() => {
               void handleSendProposal()
@@ -268,11 +269,12 @@ export function PixelCalendar({ onClose }: PixelCalendarProps): ReactElement {
           </button>
           <button
             type="button"
-            className="cursor-pointer border-4 border-[#5c3a21] bg-[#e8cfa6] px-3 py-2 text-[14px] text-[#3c2a1e] shadow-[inset_2px_2px_0_#fff6dc,inset_-2px_-2px_0_#caa574] sm:text-[15px]"
+            className="touch-manipulation min-h-11 cursor-pointer border-4 border-[#5c3a21] bg-[#e8cfa6] px-3 py-2.5 text-[14px] text-[#3c2a1e] shadow-[inset_2px_2px_0_#fff6dc,inset_-2px_-2px_0_#caa574] sm:text-[15px]"
             onClick={onClose}
           >
             Zamknij
           </button>
+        </div>
         </div>
       </div>
     </div>

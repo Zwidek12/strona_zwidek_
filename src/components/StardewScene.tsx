@@ -41,7 +41,7 @@ function CenterPortrait(): ReactElement {
           <img
             src={PORTRAIT_SRC}
             alt="Portret postaci w stylu Stardew Valley"
-            className="mx-auto block h-auto max-h-[min(52vh,520px)] w-auto max-w-[min(88vw,340px)] object-contain [image-rendering:pixelated]"
+            className="mx-auto block h-auto max-h-[min(42dvh,48svh,520px)] w-auto max-w-[min(86vw,340px)] object-contain [image-rendering:pixelated]"
             decoding="async"
             fetchPriority="high"
           />
@@ -83,17 +83,19 @@ export function StardewScene(): ReactElement {
   const [calendarOpen, setCalendarOpen] = useState<boolean>(false)
 
   return (
-    <div className="relative h-dvh w-full overflow-hidden bg-[#2a1810] font-pixel-pl text-[#3c2a1e]">
+    <div
+      className="relative flex min-h-dvh w-full flex-1 flex-col overflow-x-hidden overflow-y-auto overscroll-y-contain bg-[#2a1810] font-pixel-pl text-[#3c2a1e] pt-[env(safe-area-inset-top,0px)] pb-[max(0.75rem,env(safe-area-inset-bottom,0px))] pl-[max(0.75rem,env(safe-area-inset-left,0px))] pr-[max(0.75rem,env(safe-area-inset-right,0px))]"
+    >
       <PastoralBackdrop />
 
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/25 via-transparent to-black/35" />
 
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black/45 to-transparent" />
 
-      <div className="relative z-10 flex h-full min-h-0 flex-col">
+      <div className="relative z-10 flex min-h-0 flex-1 flex-col">
         <CenterPortrait />
 
-        <div className="p-4 pb-6 sm:p-6">
+        <div className="p-3 sm:p-6">
           <div className="mx-auto max-w-3xl border-4 border-[#5c3a21] bg-[#f5e6c8] p-4 shadow-[8px_8px_0_#2a1a0f] sm:p-5">
             <div className="min-h-[14rem] border-4 border-[#c49a6c] bg-[#fff3d6] p-3 sm:min-h-[15rem] sm:p-4">
               <p className="text-left text-[15px] leading-snug tracking-normal sm:text-[16px]">
@@ -107,7 +109,7 @@ export function StardewScene(): ReactElement {
             <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-stretch">
               <button
                 type="button"
-                className="shrink-0 border-4 border-[#5c3a21] bg-[#e8cfa6] px-4 py-3 text-left text-[14px] leading-snug text-[#3c2a1e] shadow-[inset_2px_2px_0_#fff6dc,inset_-2px_-2px_0_#caa574] sm:max-w-[58%] sm:text-[15px]"
+                className="touch-manipulation min-h-11 shrink-0 border-4 border-[#5c3a21] bg-[#e8cfa6] px-4 py-3 text-left text-[14px] leading-snug text-[#3c2a1e] shadow-[inset_2px_2px_0_#fff6dc,inset_-2px_-2px_0_#caa574] sm:max-w-[58%] sm:text-[15px]"
                 onClick={() => {
                   setCalendarOpen(true)
                 }}
