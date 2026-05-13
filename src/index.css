@@ -1,0 +1,16 @@
+@import 'tailwindcss';
+
+@theme {
+  --font-pixel-pl: 'VT323', ui-monospace, monospace;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  overflow: hidden;
+}
