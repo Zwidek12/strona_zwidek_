@@ -8,6 +8,8 @@ export interface SubmitProposalResult {
   error?: string
 }
 
+const WEB3FORMS_URL = 'https://api.web3forms.com/submit'
+
 function accessKey(): string {
   const k = import.meta.env.VITE_WEB3FORMS_ACCESS_KEY
   return typeof k === 'string' ? k.trim() : ''
@@ -34,33 +36,24 @@ export async function submitProposal(input: SubmitProposalInput): Promise<Submit
   const subject = `Propozycja terminu: ${input.dateLocal}`
   const message = `Data (lokalna): ${input.dateLocal}\n\n${input.note.trim().length > 0 ? input.note.trim() : '(brak wiadomości)'}`
 
-  const payloadBase: Record<string, string> = {
+  const body: Record<string, string> = {
+    access_key: key,
     name: 'Strona Olivia — kalendarz',
     subject,
     message,
   }
+
   const reply = replyEmail()
   if (reply !== undefined) {
-    payloadBase.email = reply
+    body.email = reply
   }
 
-  const trySubmit = async (targetUrl: string, body: Record<string, string>): Promise<Response> => {
-    return fetch(targetUrl, {
+  try {
+    const res = await fetch(WEB3FORMS_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
       body: JSON.stringify(body),
     })
-  }
-
-  const urlWithId = `https://api.web3forms.com/submit/${encodeURIComponent(key)}`
-  const urlDefault = 'https://api.web3forms.com/submit'
-  const payloadWithKey: Record<string, string> = { ...payloadBase, access_key: key }
-
-  try {
-    let res = await trySubmit(urlWithId, payloadBase)
-    if (res.status === 405 || res.status === 404) {
-      res = await trySubmit(urlDefault, payloadWithKey)
-    }
 
     let data: { success?: boolean; message?: string } = {}
     try {
@@ -75,7 +68,7 @@ export async function submitProposal(input: SubmitProposalInput): Promise<Submit
         error:
           typeof data.message === 'string' && data.message.length > 0
             ? data.message
-            : `Błąd wysyłki (${String(res.status)}). Sprawdź w DevTools → Sieć, czy żądanie idzie na api.web3forms.com.`,
+            : `Błąd wysyłki (${String(res.status)}).`,
       }
     }
 
