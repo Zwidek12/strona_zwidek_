@@ -38,7 +38,7 @@ export async function submitProposal(input: SubmitProposalInput): Promise<Submit
 
   const body: Record<string, string> = {
     access_key: key,
-    name: 'Strona Olivia — kalendarz',
+    name: 'Strona Oliwia — kalendarz',
     subject,
     message,
   }

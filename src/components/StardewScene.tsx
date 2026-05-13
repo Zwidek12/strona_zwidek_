@@ -5,7 +5,7 @@ import { PixelCalendar } from './PixelCalendar'
 import { useTypewriter } from '../hooks/useTypewriter'
 
 const DIALOG_TEXT =
-  "Cześć Olivia! Wiem, że eksploracja kopalni jest męcząca... ale ja mam dla Ciebie idealny 'prezent'. Czy dasz się zaprosić na kawę, żeby pogadać o czymś więcej niż tylko rudach?"
+  "Cześć, Oliwio! Wiem, że eksploracja kopalni jest męcząca... ale ja mam dla Ciebie idealny 'prezent'. Czy dasz się zaprosić na kawę, żeby pogadać o czymś więcej niż tylko rudach?"
 
 const PORTRAIT_SRC = '/portret.jfif'
 
