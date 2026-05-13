@@ -8,20 +8,38 @@ export interface SubmitProposalResult {
   error?: string
 }
 
+const WEB3FORMS_URL = 'https://api.web3forms.com/submit'
+
+function accessKey(): string {
+  const k = import.meta.env.VITE_WEB3FORMS_ACCESS_KEY
+  return typeof k === 'string' ? k.trim() : ''
+}
+
 export async function submitProposal(input: SubmitProposalInput): Promise<SubmitProposalResult> {
+  const key = accessKey()
+  if (key.length === 0) {
+    return {
+      ok: false,
+      error:
+        'Brak klucza Web3Forms. W Cloudflare Pages dodaj zmienną VITE_WEB3FORMS_ACCESS_KEY (Build) i przebuduj stronę.',
+    }
+  }
+
   try {
-    const res = await fetch('/api/propose', {
+    const res = await fetch(WEB3FORMS_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
       body: JSON.stringify({
-        dateLocal: input.dateLocal,
-        note: input.note,
+        access_key: key,
+        subject: `Propozycja terminu: ${input.dateLocal}`,
+        from_name: 'Strona Olivia',
+        message: `Data (lokalna): ${input.dateLocal}\n\n${input.note.trim().length > 0 ? input.note.trim() : '(brak wiadomości)'}`,
       }),
     })
 
-    let data: { ok?: boolean; error?: string } = {}
+    let data: { success?: boolean; message?: string } = {}
     try {
-      data = (await res.json()) as { ok?: boolean; error?: string }
+      data = (await res.json()) as { success?: boolean; message?: string }
     } catch {
       void 0
     }
@@ -29,12 +47,21 @@ export async function submitProposal(input: SubmitProposalInput): Promise<Submit
     if (!res.ok) {
       return {
         ok: false,
-        error: typeof data.error === 'string' ? data.error : `Błąd serwera (${String(res.status)})`,
+        error:
+          typeof data.message === 'string' && data.message.length > 0
+            ? data.message
+            : `Błąd wysyłki (${String(res.status)})`,
       }
     }
 
-    if (data.ok !== true) {
-      return { ok: false, error: 'Nieoczekiwana odpowiedź serwera.' }
+    if (data.success !== true) {
+      return {
+        ok: false,
+        error:
+          typeof data.message === 'string' && data.message.length > 0
+            ? data.message
+            : 'Formularz nie został zaakceptowany.',
+      }
     }
 
     return { ok: true }
@@ -42,7 +69,7 @@ export async function submitProposal(input: SubmitProposalInput): Promise<Submit
     console.error('submitProposal', err)
     return {
       ok: false,
-      error: 'Brak połączenia ze stroną.',
+      error: 'Brak połączenia (sprawdź internet).',
     }
   }
 }
