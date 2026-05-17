@@ -15,7 +15,7 @@ export function SuccessScreen(): React.ReactElement {
         </p>
         <p className="flex items-center justify-center gap-2 text-base text-slate-300">
           <MessageCircle className="h-5 w-5 shrink-0 text-emerald-400" />
-          Napisz mi na messengerze, o której Ci pasuje!
+          Napisz mi na discordzie, o której Ci pasuje!
         </p>
         <div className="mt-8 inline-block rounded-full bg-emerald-500/20 px-4 py-2 text-sm font-mono text-emerald-300">
           HTTP 201 Created · Connection Established
