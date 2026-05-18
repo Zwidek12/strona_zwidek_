@@ -8,22 +8,21 @@ body,
   min-height: 100dvh;
 }
 
-body {
-  font-family: 'Open Sans', sans-serif;
-  -webkit-font-smoothing: antialiased;
+@keyframes blink-error {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
 }
 
-.swagger-scrollbar::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+.blink-error {
+  animation: blink-error 1.2s ease-in-out infinite;
 }
 
-.swagger-scrollbar::-webkit-scrollbar-thumb {
-  background: #ccc;
-  border-radius: 4px;
-}
-
-@keyframes swagger-fade-out {
+@keyframes ui-fade-out {
   from {
     opacity: 1;
   }
@@ -32,22 +31,22 @@ body {
   }
 }
 
-.swagger-fade-out {
-  animation: swagger-fade-out 0.8s ease forwards;
+.ui-fade-out {
+  animation: ui-fade-out 0.8s ease forwards;
   pointer-events: none;
 }
 
-@keyframes success-fade-in {
+@keyframes warrant-in {
   from {
     opacity: 0;
-    transform: scale(0.96);
+    transform: translateY(12px);
   }
   to {
     opacity: 1;
-    transform: scale(1);
+    transform: translateY(0);
   }
 }
 
-.success-fade-in {
-  animation: success-fade-in 0.6s ease forwards;
+.warrant-in {
+  animation: warrant-in 0.5s ease forwards;
 }
