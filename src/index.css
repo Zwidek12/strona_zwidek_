@@ -50,3 +50,18 @@ body,
 .warrant-in {
   animation: warrant-in 0.5s ease forwards;
 }
+
+@keyframes lulu-gif-popup {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.lulu-gif-popup > div {
+  animation: lulu-gif-popup 0.45s ease forwards;
+}

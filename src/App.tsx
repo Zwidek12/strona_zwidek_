@@ -87,6 +87,11 @@ const DEFAULT_POST_BODY = `{
   "targetMain": "Lulu"
 }`
 
+const LULU_GIF_URL =
+  'https://media1.tenor.com/m/68d3zuB5U64AAAAC/lulu-cute.gif'
+
+const LULU_GIF_DELAY_MS = 5000
+
 function fireConfetti(): void {
   const duration = 3000
   const end = Date.now() + duration
@@ -256,6 +261,7 @@ export default function App(): React.ReactElement {
 
   const [location, setLocation] = useState('')
   const [warrantConfirmed, setWarrantConfirmed] = useState(false)
+  const [showLuluGif, setShowLuluGif] = useState(false)
 
   const [terminalLines, setTerminalLines] = useState<string[]>([
     TERMINAL_MESSAGES[0],
@@ -331,6 +337,17 @@ export default function App(): React.ReactElement {
       fireConfetti()
     }
   }, [view])
+
+  useEffect(() => {
+    if (!warrantConfirmed) {
+      setShowLuluGif(false)
+      return
+    }
+    const timer = window.setTimeout(() => {
+      setShowLuluGif(true)
+    }, LULU_GIF_DELAY_MS)
+    return () => window.clearTimeout(timer)
+  }, [warrantConfirmed])
 
   useEffect(() => {
     setResponse(null)
@@ -439,7 +456,7 @@ export default function App(): React.ReactElement {
       <div className="flex min-h-screen items-center justify-center bg-slate-200 p-4 font-serif sm:p-8">
         <div className="warrant-in w-full max-w-2xl border-4 border-slate-900 bg-white p-8 shadow-2xl sm:p-12">
           {warrantConfirmed ? (
-            <div className="py-8 text-center">
+            <div className="relative py-8 text-center">
               <Shield className="mx-auto mb-6 h-16 w-16 text-emerald-700" />
               <h1 className="text-2xl font-bold leading-tight text-slate-900 sm:text-4xl">
                 Nakaz zapisany w bazie KWP!
@@ -452,6 +469,35 @@ export default function App(): React.ReactElement {
                   Lokalizacja:{' '}
                   <span className="font-semibold text-slate-800">{location}</span>
                 </p>
+              ) : null}
+
+              {showLuluGif ? (
+                <div
+                  className="lulu-gif-popup fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+                  role="dialog"
+                  aria-label="Do zobaczenia"
+                >
+                  <div className="w-full max-w-md rounded-2xl border-4 border-purple-500 bg-white p-6 shadow-2xl">
+                    <img
+                      src={LULU_GIF_URL}
+                      alt="Lulu cute"
+                      className="mx-auto max-h-[min(60vh,400px)] w-auto rounded-lg"
+                    />
+                    <p className="mt-4 text-2xl font-bold text-purple-700 sm:text-3xl">
+                      Do zobaczenia!
+                    </p>
+                    <p className="mt-2 text-sm text-slate-600">
+                      Do zobaczenia na Wejherowie — czekam na screena na Discordzie.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => setShowLuluGif(false)}
+                      className="mt-5 rounded-lg border-2 border-slate-800 bg-slate-900 px-6 py-2 text-sm font-bold text-white hover:bg-slate-800"
+                    >
+                      Zamknij
+                    </button>
+                  </div>
+                </div>
               ) : null}
             </div>
           ) : (
