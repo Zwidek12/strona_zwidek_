@@ -1,18 +1,441 @@
-<!doctype html>
-<html lang="pl">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>KWP - System Analizy Poszlak v2.0</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Maksymilian Frankowski | IT Infrastructure & Cybersecurity</title>
+  <meta name="description" content="Junior Solution Engineer & Cybersecurity Enthusiast — building resilient IT infrastructure and exploring offensive/defensive security." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            heading: ['"Space Grotesk"', 'system-ui', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
+          },
+          animation: {
+            'fade-in': 'fadeIn 0.8s ease-out forwards',
+            'fade-in-up': 'fadeInUp 0.8s ease-out forwards',
+            'pulse-glow': 'pulseGlow 2s ease-in-out infinite',
+            'blink': 'blink 1s step-end infinite',
+          },
+          keyframes: {
+            fadeIn: {
+              '0%': { opacity: '0' },
+              '100%': { opacity: '1' },
+            },
+            fadeInUp: {
+              '0%': { opacity: '0', transform: 'translateY(24px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' },
+            },
+            pulseGlow: {
+              '0%, 100%': { boxShadow: '0 0 8px rgba(34, 211, 238, 0.4)' },
+              '50%': { boxShadow: '0 0 16px rgba(34, 211, 238, 0.8)' },
+            },
+            blink: {
+              '0%, 100%': { opacity: '1' },
+              '50%': { opacity: '0' },
+            },
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    html { scroll-behavior: smooth; }
+    body { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+    h1, h2, h3, h4, .font-heading { font-family: 'Space Grotesk', system-ui, sans-serif; }
+
+    .fade-section {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.7s ease-out, transform 0.7s ease-out;
+    }
+    .fade-section.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .grid-bg {
+      background-image:
+        linear-gradient(rgba(34, 211, 238, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(34, 211, 238, 0.03) 1px, transparent 1px);
+      background-size: 48px 48px;
+    }
+
+    .scanline::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0, 0, 0, 0.03) 2px,
+        rgba(0, 0, 0, 0.03) 4px
+      );
+      pointer-events: none;
+      z-index: 50;
+    }
+
+    .glow-cyan { text-shadow: 0 0 20px rgba(34, 211, 238, 0.5); }
+    .glow-dot { box-shadow: 0 0 8px #4ade80, 0 0 16px rgba(74, 222, 128, 0.4); }
+
+    ::selection {
+      background: rgba(34, 211, 238, 0.3);
+      color: #f8fafc;
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-300 antialiased scanline grid-bg min-h-screen">
+
+  <!-- Ambient glow -->
+  <div class="pointer-events-none fixed inset-0 overflow-hidden" aria-hidden="true">
+    <div class="absolute -top-40 -right-40 h-96 w-96 rounded-full bg-cyan-500/10 blur-3xl"></div>
+    <div class="absolute top-1/2 -left-40 h-80 w-80 rounded-full bg-emerald-500/5 blur-3xl"></div>
+    <div class="absolute bottom-0 right-1/4 h-64 w-64 rounded-full bg-cyan-400/5 blur-3xl"></div>
+  </div>
+
+  <!-- NAV -->
+  <header class="fixed top-0 left-0 right-0 z-40 border-b border-cyan-400/10 bg-slate-950/80 backdrop-blur-md animate-fade-in">
+    <nav class="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+      <a href="#" class="font-heading text-sm font-semibold tracking-widest text-cyan-400">
+        MF<span class="text-slate-500">_</span>SYS
+      </a>
+      <ul class="hidden items-center gap-8 font-mono text-xs uppercase tracking-wider text-slate-400 sm:flex">
+        <li><a href="#about" class="transition-colors hover:text-cyan-400">About</a></li>
+        <li><a href="#stack" class="transition-colors hover:text-cyan-400">Stack</a></li>
+        <li><a href="#projects" class="transition-colors hover:text-cyan-400">Projects</a></li>
+        <li><a href="#homelab" class="transition-colors hover:text-cyan-400">Homelab</a></li>
+      </ul>
+      <button id="menu-btn" type="button" class="flex h-10 w-10 items-center justify-center rounded border border-cyan-400/30 text-cyan-400 sm:hidden" aria-label="Toggle menu">
+        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+    </nav>
+    <div id="mobile-menu" class="hidden border-t border-cyan-400/10 bg-slate-950/95 px-6 py-4 sm:hidden">
+      <ul class="flex flex-col gap-4 font-mono text-xs uppercase tracking-wider">
+        <li><a href="#about" class="block py-1 text-slate-400 hover:text-cyan-400">About</a></li>
+        <li><a href="#stack" class="block py-1 text-slate-400 hover:text-cyan-400">Stack</a></li>
+        <li><a href="#projects" class="block py-1 text-slate-400 hover:text-cyan-400">Projects</a></li>
+        <li><a href="#homelab" class="block py-1 text-slate-400 hover:text-cyan-400">Homelab</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <main class="relative z-10">
+
+    <!-- HERO -->
+    <section class="relative flex min-h-screen flex-col justify-center px-6 pt-24 pb-16">
+      <div class="mx-auto w-full max-w-6xl">
+        <p class="mb-4 font-mono text-xs text-cyan-400/80 animate-fade-in" style="animation-delay: 0.1s">
+          // INITIALIZING PROFILE...
+        </p>
+        <h1 class="font-heading text-5xl font-bold tracking-tight text-slate-100 sm:text-6xl md:text-7xl lg:text-8xl animate-fade-in-up glow-cyan" style="animation-delay: 0.2s">
+          Maksymilian<br class="sm:hidden" /> Frankowski
+        </h1>
+        <p class="mt-6 font-mono text-lg text-slate-400 sm:text-xl md:text-2xl animate-fade-in-up" style="animation-delay: 0.35s">
+          <span class="text-cyan-400">&gt;</span>
+          Junior Solution Engineer &amp; Cybersecurity Enthusiast
+          <span id="cursor" class="ml-1 inline-block h-[1.1em] w-2 translate-y-0.5 bg-cyan-400 animate-blink align-middle" aria-hidden="true"></span>
+        </p>
+        <p class="mt-8 max-w-2xl font-mono text-sm leading-relaxed text-slate-400 sm:text-base animate-fade-in-up" style="animation-delay: 0.5s">
+          Building resilient IT infrastructure, automating complex tasks, and exploring the offensive/defensive sides of cybersecurity. Also known as <span class="text-cyan-400">@Zwidek</span>.
+        </p>
+        <div class="mt-10 flex flex-wrap gap-4 animate-fade-in-up" style="animation-delay: 0.65s">
+          <a href="#homelab" class="group inline-flex items-center gap-2 rounded border border-cyan-400 px-6 py-3 font-mono text-sm text-cyan-400 transition-all hover:bg-cyan-400/10 hover:shadow-[0_0_20px_rgba(34,211,238,0.3)]">
+            Deploy Homelab
+            <span class="transition-transform group-hover:translate-x-1">→</span>
+          </a>
+          <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 rounded border border-slate-600 px-6 py-3 font-mono text-sm text-slate-300 transition-all hover:border-slate-400 hover:bg-white/5 hover:text-slate-100">
+            GitHub
+            <span>→</span>
+          </a>
+        </div>
+        <div class="mt-20 flex items-center gap-3 font-mono text-xs text-slate-600">
+          <span class="h-2 w-2 rounded-full bg-emerald-400 glow-dot"></span>
+          <span>STATUS: ONLINE</span>
+          <span class="text-slate-700">|</span>
+          <span>UPTIME: LEARNING</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ABOUT -->
+    <section id="about" class="fade-section border-t border-cyan-400/10 px-6 py-24">
+      <div class="mx-auto max-w-6xl">
+        <p class="font-mono text-xs text-cyan-400">01 // ABOUT</p>
+        <h2 class="font-heading mt-2 text-3xl font-bold text-slate-100 sm:text-4xl">System Logs</h2>
+        <div class="mt-12 grid gap-10 lg:grid-cols-2 lg:gap-16">
+          <div class="rounded-lg border border-cyan-400/20 bg-white/5 p-6 backdrop-blur-md transition-colors hover:border-cyan-400/40 sm:p-8">
+            <div class="mb-4 flex items-center gap-2 border-b border-slate-700/50 pb-4">
+              <span class="h-3 w-3 rounded-full bg-red-500/80"></span>
+              <span class="h-3 w-3 rounded-full bg-yellow-500/80"></span>
+              <span class="h-3 w-3 rounded-full bg-emerald-500/80"></span>
+              <span class="ml-2 font-mono text-xs text-slate-500">bio.log — tail -f</span>
+            </div>
+            <pre class="font-mono text-xs leading-relaxed text-slate-400 sm:text-sm"><code><span class="text-cyan-400">[INFO]</span>  User: maksymilian.frankowski
+<span class="text-cyan-400">[INFO]</span>  Role: IT Infrastructure &amp; Security
+<span class="text-cyan-400">[INFO]</span>  Alias: @Zwidek
+<span class="text-emerald-400">[OK]</span>   Education: WSB Merito — Advanced IT
+<span class="text-emerald-400">[OK]</span>   Focus: AD, Virtualization, NetSec
+<span class="text-yellow-400">[RUN]</span>  Side quest: AI automation
+<span class="text-slate-500">---</span>
+<span class="text-slate-500">// End of log stream</span></code></pre>
+          </div>
+          <div class="flex flex-col justify-center">
+            <p class="font-mono text-sm leading-relaxed text-slate-400 sm:text-base">
+              I am an advanced IT student at <span class="text-slate-200">Uniwersytet WSB Merito</span>. I specialize in Active Directory, virtualization, and network security. When I'm not configuring GPOs or testing vulnerabilities, I'm automating my life with AI or optimizing global logistics in <span class="text-cyan-400/90">Factorio</span> and <span class="text-cyan-400/90">Civilization VI</span>.
+            </p>
+            <div class="mt-8 flex flex-wrap gap-3">
+              <span class="rounded border border-slate-700 bg-slate-900/50 px-3 py-1 font-mono text-xs text-slate-400">Active Directory</span>
+              <span class="rounded border border-slate-700 bg-slate-900/50 px-3 py-1 font-mono text-xs text-slate-400">GPO</span>
+              <span class="rounded border border-slate-700 bg-slate-900/50 px-3 py-1 font-mono text-xs text-slate-400">Virtualization</span>
+              <span class="rounded border border-slate-700 bg-slate-900/50 px-3 py-1 font-mono text-xs text-slate-400">Pen Testing</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TECH STACK -->
+    <section id="stack" class="fade-section border-t border-cyan-400/10 px-6 py-24">
+      <div class="mx-auto max-w-6xl">
+        <p class="font-mono text-xs text-cyan-400">02 // TECH STACK</p>
+        <h2 class="font-heading mt-2 text-3xl font-bold text-slate-100 sm:text-4xl">Deployed Modules</h2>
+        <p class="mt-4 max-w-xl font-mono text-sm text-slate-500">Core technologies across infrastructure, security, and automation pipelines.</p>
+        <div class="mt-12 grid gap-6 md:grid-cols-3">
+          <!-- Infrastructure -->
+          <article class="group rounded-lg border border-cyan-400/20 bg-white/5 p-6 backdrop-blur-md transition-all hover:border-cyan-400/50 hover:bg-white/[0.07] hover:shadow-[0_0_30px_rgba(34,211,238,0.08)] sm:p-8">
+            <div class="mb-4 flex items-center gap-2">
+              <svg class="h-5 w-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2"/></svg>
+              <h3 class="font-heading text-lg font-semibold text-slate-100">Infrastructure</h3>
+            </div>
+            <ul class="space-y-3 font-mono text-sm text-slate-400">
+              <li class="flex items-center gap-2"><span class="text-cyan-400">▸</span> Windows Server</li>
+              <li class="flex items-center gap-2"><span class="text-cyan-400">▸</span> Linux (Ubuntu/Debian)</li>
+              <li class="flex items-center gap-2"><span class="text-cyan-400">▸</span> Active Directory</li>
+              <li class="flex items-center gap-2"><span class="text-cyan-400">▸</span> Docker</li>
+              <li class="flex items-center gap-2"><span class="text-cyan-400">▸</span> Hetzner Cloud</li>
+            </ul>
+          </article>
+          <!-- Security -->
+          <article class="group rounded-lg border border-cyan-400/20 bg-white/5 p-6 backdrop-blur-md transition-all hover:border-cyan-400/50 hover:bg-white/[0.07] hover:shadow-[0_0_30px_rgba(34,211,238,0.08)] sm:p-8">
+            <div class="mb-4 flex items-center gap-2">
+              <svg class="h-5 w-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/></svg>
+              <h3 class="font-heading text-lg font-semibold text-slate-100">Security &amp; Net</h3>
+            </div>
+            <ul class="space-y-3 font-mono text-sm text-slate-400">
+              <li class="flex items-center gap-2"><span class="text-cyan-400">▸</span> Cloudflare</li>
+              <li class="flex items-center gap-2"><span class="text-cyan-400">▸</span> Firewall Configuration</li>
+              <li class="flex items-center gap-2"><span class="text-cyan-400">▸</span> Network Protocols</li>
+              <li class="flex items-center gap-2"><span class="text-cyan-400">▸</span> Penetration Testing basics</li>
+            </ul>
+          </article>
+          <!-- Automation -->
+          <article class="group rounded-lg border border-cyan-400/20 bg-white/5 p-6 backdrop-blur-md transition-all hover:border-cyan-400/50 hover:bg-white/[0.07] hover:shadow-[0_0_30px_rgba(34,211,238,0.08)] sm:p-8 md:col-span-1">
+            <div class="mb-4 flex items-center gap-2">
+              <svg class="h-5 w-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5"/></svg>
+              <h3 class="font-heading text-lg font-semibold text-slate-100">Automation</h3>
+            </div>
+            <ul class="space-y-3 font-mono text-sm text-slate-400">
+              <li class="flex items-center gap-2"><span class="text-cyan-400">▸</span> Python</li>
+              <li class="flex items-center gap-2"><span class="text-cyan-400">▸</span> Bash</li>
+              <li class="flex items-center gap-2"><span class="text-cyan-400">▸</span> PowerShell</li>
+              <li class="flex items-center gap-2"><span class="text-cyan-400">▸</span> AI Integration (Claude/Cursor)</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROJECTS -->
+    <section id="projects" class="fade-section border-t border-cyan-400/10 px-6 py-24">
+      <div class="mx-auto max-w-6xl">
+        <p class="font-mono text-xs text-cyan-400">03 // PROJECTS</p>
+        <h2 class="font-heading mt-2 text-3xl font-bold text-slate-100 sm:text-4xl">Active Deployments</h2>
+        <div class="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <!-- Project 1 -->
+          <article class="flex flex-col rounded-lg border border-cyan-400/20 bg-white/5 p-6 backdrop-blur-md transition-all hover:border-cyan-400/40 hover:bg-white/[0.07] sm:p-8">
+            <div class="mb-4 font-mono text-xs text-cyan-400/70">PRJ-001</div>
+            <h3 class="font-heading text-xl font-semibold text-slate-100">AI Interview Pro</h3>
+            <p class="mt-3 flex-grow font-mono text-sm leading-relaxed text-slate-400">
+              A system simulating technical interviews using AI — practice scenarios, real-time feedback, and adaptive difficulty.
+            </p>
+            <div class="mt-6 flex flex-wrap gap-2">
+              <span class="rounded border border-cyan-400/30 bg-cyan-400/5 px-2 py-0.5 font-mono text-xs text-cyan-400">Python</span>
+              <span class="rounded border border-cyan-400/30 bg-cyan-400/5 px-2 py-0.5 font-mono text-xs text-cyan-400">LLM API</span>
+            </div>
+            <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="mt-6 inline-flex items-center gap-1 font-mono text-sm text-cyan-400 transition-colors hover:text-cyan-300">
+              View Code <span class="transition-transform group-hover:translate-x-1">→</span>
+            </a>
+          </article>
+          <!-- Project 2 -->
+          <article class="flex flex-col rounded-lg border border-cyan-400/20 bg-white/5 p-6 backdrop-blur-md transition-all hover:border-cyan-400/40 hover:bg-white/[0.07] sm:p-8">
+            <div class="mb-4 font-mono text-xs text-cyan-400/70">PRJ-002</div>
+            <h3 class="font-heading text-xl font-semibold text-slate-100">Jarvis Voice Assistant</h3>
+            <p class="mt-3 flex-grow font-mono text-sm leading-relaxed text-slate-400">
+              Custom voice assistant with wake-word detection and deep system integration for hands-free control.
+            </p>
+            <div class="mt-6 flex flex-wrap gap-2">
+              <span class="rounded border border-cyan-400/30 bg-cyan-400/5 px-2 py-0.5 font-mono text-xs text-cyan-400">Python</span>
+              <span class="rounded border border-cyan-400/30 bg-cyan-400/5 px-2 py-0.5 font-mono text-xs text-cyan-400">Audio Processing</span>
+            </div>
+            <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="mt-6 inline-flex items-center gap-1 font-mono text-sm text-cyan-400 transition-colors hover:text-cyan-300">
+              View Code →
+            </a>
+          </article>
+          <!-- Project 3 -->
+          <article class="flex flex-col rounded-lg border border-cyan-400/20 bg-white/5 p-6 backdrop-blur-md transition-all hover:border-cyan-400/40 hover:bg-white/[0.07] sm:p-8 md:col-span-2 lg:col-span-1">
+            <div class="mb-4 font-mono text-xs text-cyan-400/70">PRJ-003</div>
+            <h3 class="font-heading text-xl font-semibold text-slate-100">Enterprise Homelab</h3>
+            <p class="mt-3 flex-grow font-mono text-sm leading-relaxed text-slate-400">
+              Automated deployment of reverse proxies, container orchestration, and network monitoring on bare-metal &amp; cloud.
+            </p>
+            <div class="mt-6 flex flex-wrap gap-2">
+              <span class="rounded border border-cyan-400/30 bg-cyan-400/5 px-2 py-0.5 font-mono text-xs text-cyan-400">Docker</span>
+              <span class="rounded border border-cyan-400/30 bg-cyan-400/5 px-2 py-0.5 font-mono text-xs text-cyan-400">Linux</span>
+            </div>
+            <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="mt-6 inline-flex items-center gap-1 font-mono text-sm text-cyan-400 transition-colors hover:text-cyan-300">
+              View Code →
+            </a>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- HOMELAB -->
+    <section id="homelab" class="fade-section border-t border-cyan-400/10 px-6 py-24">
+      <div class="mx-auto max-w-6xl">
+        <p class="font-mono text-xs text-cyan-400">04 // HOMELAB DASHBOARD</p>
+        <h2 class="font-heading mt-2 text-3xl font-bold text-slate-100 sm:text-4xl">Server Status</h2>
+        <p class="mt-4 max-w-2xl font-mono text-sm text-slate-400">
+          I host my own cloud infrastructure to learn by doing. Running on <span class="text-cyan-400">Hetzner Cloud</span>.
+        </p>
+
+        <div class="mt-12 overflow-hidden rounded-lg border border-cyan-400/20 bg-slate-900/50 backdrop-blur-md">
+          <!-- Dashboard header -->
+          <div class="flex flex-wrap items-center justify-between gap-4 border-b border-cyan-400/10 bg-slate-900/80 px-6 py-4">
+            <div class="flex items-center gap-3">
+              <span class="relative flex h-3 w-3">
+                <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-40"></span>
+                <span class="relative inline-flex h-3 w-3 rounded-full bg-emerald-400 glow-dot"></span>
+              </span>
+              <span class="font-mono text-sm text-emerald-400">CLUSTER: OPERATIONAL</span>
+            </div>
+            <span class="font-mono text-xs text-slate-500">hetzner-fsn1 · dc-01</span>
+          </div>
+
+          <!-- Metrics row -->
+          <div class="grid gap-px border-b border-cyan-400/10 bg-cyan-400/5 sm:grid-cols-3">
+            <div class="bg-slate-950/50 px-6 py-5">
+              <p class="font-mono text-xs text-slate-500">CPU LOAD</p>
+              <p class="mt-1 font-heading text-2xl font-bold text-slate-100">12<span class="text-cyan-400">%</span></p>
+            </div>
+            <div class="bg-slate-950/50 px-6 py-5">
+              <p class="font-mono text-xs text-slate-500">MEMORY</p>
+              <p class="mt-1 font-heading text-2xl font-bold text-slate-100">4.2<span class="text-cyan-400"> / 8 GB</span></p>
+            </div>
+            <div class="bg-slate-950/50 px-6 py-5">
+              <p class="font-mono text-xs text-slate-500">CONTAINERS</p>
+              <p class="mt-1 font-heading text-2xl font-bold text-slate-100">7<span class="text-emerald-400"> running</span></p>
+            </div>
+          </div>
+
+          <!-- Services -->
+          <div class="divide-y divide-cyan-400/10">
+            <div class="flex flex-wrap items-center justify-between gap-4 px-6 py-4 transition-colors hover:bg-white/[0.02]">
+              <div class="flex items-center gap-4">
+                <span class="h-2 w-2 rounded-full bg-emerald-400 glow-dot"></span>
+                <span class="font-mono text-sm text-slate-200">Portainer</span>
+              </div>
+              <span class="rounded-full border border-emerald-400/30 bg-emerald-400/10 px-3 py-1 font-mono text-xs text-emerald-400">Status: Online</span>
+            </div>
+            <div class="flex flex-wrap items-center justify-between gap-4 px-6 py-4 transition-colors hover:bg-white/[0.02]">
+              <div class="flex items-center gap-4">
+                <span class="h-2 w-2 rounded-full bg-emerald-400 glow-dot"></span>
+                <span class="font-mono text-sm text-slate-200">Nginx Proxy Manager</span>
+              </div>
+              <span class="rounded-full border border-emerald-400/30 bg-emerald-400/10 px-3 py-1 font-mono text-xs text-emerald-400">Status: Online</span>
+            </div>
+            <div class="flex flex-wrap items-center justify-between gap-4 px-6 py-4 transition-colors hover:bg-white/[0.02]">
+              <div class="flex items-center gap-4">
+                <span class="h-2 w-2 rounded-full bg-emerald-400 glow-dot"></span>
+                <span class="font-mono text-sm text-slate-200">Cloudflare Tunnels</span>
+              </div>
+              <span class="rounded-full border border-emerald-400/30 bg-emerald-400/10 px-3 py-1 font-mono text-xs text-emerald-400">Status: Online</span>
+            </div>
+          </div>
+
+          <!-- Terminal footer inside dashboard -->
+          <div class="border-t border-cyan-400/10 bg-slate-950/80 px-6 py-3">
+            <p class="font-mono text-xs text-slate-500">
+              <span class="text-cyan-400">$</span> docker ps --format "table {{.Names}}\t{{.Status}}" | grep -E "portainer|nginx|cloudflared"
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="relative z-10 border-t border-cyan-400/10 px-6 py-16">
+    <div class="mx-auto max-w-6xl">
+      <div class="flex flex-col items-center justify-between gap-8 sm:flex-row">
+        <div class="flex items-center gap-6">
+          <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" class="group flex items-center gap-2 font-mono text-sm text-slate-400 transition-colors hover:text-cyan-400">
+            <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+            LinkedIn
+          </a>
+          <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="group flex items-center gap-2 font-mono text-sm text-slate-400 transition-colors hover:text-cyan-400">
+            <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"/></svg>
+            GitHub
+          </a>
+        </div>
+        <p class="font-mono text-xs text-slate-600">© 2026 Maksymilian Frankowski</p>
+      </div>
+      <div class="mt-10 rounded border border-slate-800 bg-slate-900/80 px-4 py-3 font-mono text-xs sm:text-sm">
+        <span class="text-emerald-400">root@zwidek</span><span class="text-slate-500">:~#</span>
+        <span class="text-slate-300"> systemctl status future_career --active</span>
+        <span id="footer-cursor" class="ml-1 inline-block h-4 w-2 bg-cyan-400 animate-blink align-middle"></span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      const menuBtn = document.getElementById('menu-btn');
+      const mobileMenu = document.getElementById('mobile-menu');
+      if (menuBtn && mobileMenu) {
+        menuBtn.addEventListener('click', function () {
+          mobileMenu.classList.toggle('hidden');
+        });
+        mobileMenu.querySelectorAll('a').forEach(function (link) {
+          link.addEventListener('click', function () {
+            mobileMenu.classList.add('hidden');
+          });
+        });
+      }
+
+      const sections = document.querySelectorAll('.fade-section');
+      const observer = new IntersectionObserver(
+        function (entries) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('visible');
+            }
+          });
+        },
+        { threshold: 0.1, rootMargin: '0px 0px -40px 0px' }
+      );
+      sections.forEach(function (section) {
+        observer.observe(section);
+      });
+    })();
+  </script>
+</body>
 </html>
