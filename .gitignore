@@ -2,6 +2,9 @@
 Thumbs.db
 Desktop.ini
 
+dist/
+node_modules/
+
 .env
 .env.*
 *.local

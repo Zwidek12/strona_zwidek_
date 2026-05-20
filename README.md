@@ -12,4 +12,16 @@ npx serve .
 
 ## GitHub Pages
 
-This repo can be published with **Settings → Pages → Source: Deploy from branch `main` / folder `/ (root)`**.
+**Settings → Pages →** branch `main`, folder `/ (root)`.
+
+## Cloudflare Pages
+
+Recommended build settings:
+
+| Setting | Value |
+|---------|--------|
+| Build command | `npm run build` |
+| Build output directory | `dist` |
+| Root directory | `/` |
+
+The build only copies `index.html` into `dist/` (no Vite). After renaming the repo, reconnect Git to `Zwidek12/strona_zwidek_` in the Cloudflare project settings.
