@@ -115,6 +115,23 @@
       background: rgba(34, 211, 238, 0.3);
       color: #f8fafc;
     }
+
+    .iframe-panel {
+      transition: box-shadow 0.35s ease;
+    }
+
+    .iframe-panel:hover {
+      box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.3), 0 0 30px rgba(34, 211, 238, 0.12);
+    }
+
+    @keyframes pulseRed {
+      0%, 100% { box-shadow: 0 0 6px rgba(248, 113, 113, 0.5); }
+      50%       { box-shadow: 0 0 14px rgba(248, 113, 113, 0.9); }
+    }
+
+    .glow-dot-red {
+      animation: pulseRed 2s ease-in-out infinite;
+    }
   </style>
 </head>
 
@@ -150,6 +167,7 @@
         <li><a href="#stack" class="transition-colors hover:text-cyan-400">Stack</a></li>
         <li><a href="#projects" class="transition-colors hover:text-cyan-400">Projects</a></li>
         <li><a href="#homelab" class="transition-colors hover:text-cyan-400">Homelab</a></li>
+        <li><a href="#lab" class="transition-colors hover:text-cyan-400">Lab</a></li>
         <li><a href="#contact" class="transition-colors hover:text-cyan-400">Contact</a></li>
       </ul>
       <button id="menu-btn" type="button"
@@ -166,6 +184,7 @@
         <li><a href="#stack" class="block py-1 text-slate-400 hover:text-cyan-400">Stack</a></li>
         <li><a href="#projects" class="block py-1 text-slate-400 hover:text-cyan-400">Projects</a></li>
         <li><a href="#homelab" class="block py-1 text-slate-400 hover:text-cyan-400">Homelab</a></li>
+        <li><a href="#lab" class="block py-1 text-slate-400 hover:text-cyan-400">Lab</a></li>
         <li><a href="#contact" class="block py-1 text-slate-400 hover:text-cyan-400">Contact</a></li>
       </ul>
     </div>
@@ -548,12 +567,247 @@
       </div>
     </section>
 
+    <!-- SECURITY LAB -->
+    <section id="lab" class="fade-section border-t border-cyan-400/10 px-6 py-24">
+      <div class="mx-auto max-w-6xl">
+
+        <!-- Header -->
+        <p class="font-mono text-xs text-cyan-400">05 // SECURITY LAB</p>
+        <h2 class="font-heading mt-2 text-3xl font-bold text-slate-100 sm:text-4xl">Zwidek Security &amp; Infrastructure Lab</h2>
+        <p class="mt-4 max-w-2xl font-mono text-sm text-slate-500">Live threat intelligence, self-hosted services, and bare-metal infrastructure — all running 24/7 on dedicated hardware.</p>
+
+        <!-- ── PART 1: LIVE THREAT INTELLIGENCE ── -->
+        <div class="mt-16">
+          <div class="mb-6 flex flex-wrap items-center gap-4">
+            <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded border border-red-500/30 bg-red-500/10">
+              <svg class="h-4 w-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+              </svg>
+            </div>
+            <div>
+              <h3 class="font-heading text-xl font-semibold text-slate-100">Live Threat Intelligence</h3>
+              <p class="font-mono text-xs text-slate-500">Cowrie SSH Honeypot · zwidek-core-01 · Docker container</p>
+            </div>
+            <div class="ml-auto flex items-center gap-2">
+              <span class="relative flex h-2 w-2">
+                <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-60"></span>
+                <span class="relative inline-flex h-2 w-2 rounded-full bg-red-400 glow-dot-red"></span>
+              </span>
+              <span class="font-mono text-xs font-semibold tracking-widest text-red-400">LIVE</span>
+            </div>
+          </div>
+
+          <p class="mb-8 max-w-3xl font-mono text-sm leading-relaxed text-slate-400">
+            Interaktywny dashboard przedstawiający w czasie rzeczywistym zautomatyzowane ataki brute-force SSH z całego świata.
+            Ataki są wychwytywane na żywo przez autorski sensor <span class="text-slate-200">Cowrie Honeypot</span>,
+            uruchomiony w odizolowanym środowisku kontenerowym na dedykowanym serwerze.
+          </p>
+
+          <!-- iframes grid -->
+          <div class="space-y-4">
+            <!-- World map — full width -->
+            <div class="iframe-panel overflow-hidden rounded-lg border border-cyan-400/20 bg-slate-900/50">
+              <div class="flex items-center gap-2 border-b border-cyan-400/10 bg-slate-900/80 px-4 py-2">
+                <span class="h-2 w-2 rounded-full bg-red-500/80"></span>
+                <span class="h-2 w-2 rounded-full bg-yellow-500/80"></span>
+                <span class="h-2 w-2 rounded-full bg-emerald-500/80"></span>
+                <span class="ml-2 font-mono text-[10px] text-slate-500">attack-origin-map · global · last 6h</span>
+              </div>
+              <iframe
+                src="https://grafana.zwidek.pl/d-solo/adbcwkn/honeypod-map?orgId=1&from=now-6h&to=now&timezone=browser&theme=dark&panelId=panel-1&refresh=1m"
+                width="100%" height="450" frameborder="0" loading="lazy" title="Attack origin world map"></iframe>
+            </div>
+
+            <!-- Pie chart + IP table -->
+            <div class="grid gap-4 sm:grid-cols-2">
+              <div class="iframe-panel overflow-hidden rounded-lg border border-cyan-400/20 bg-slate-900/50">
+                <div class="flex items-center gap-2 border-b border-cyan-400/10 bg-slate-900/80 px-4 py-2">
+                  <span class="h-2 w-2 rounded-full bg-red-500/80"></span>
+                  <span class="h-2 w-2 rounded-full bg-yellow-500/80"></span>
+                  <span class="h-2 w-2 rounded-full bg-emerald-500/80"></span>
+                  <span class="ml-2 font-mono text-[10px] text-slate-500">attack-distribution · pie chart</span>
+                </div>
+                <iframe
+                  src="https://grafana.zwidek.pl/d-solo/adbcwkn/honeypod-map?orgId=1&from=now-6h&to=now&timezone=browser&theme=dark&panelId=panel-2&refresh=1m"
+                  width="100%" height="300" frameborder="0" loading="lazy" title="Attack distribution chart"></iframe>
+              </div>
+              <div class="iframe-panel overflow-hidden rounded-lg border border-cyan-400/20 bg-slate-900/50">
+                <div class="flex items-center gap-2 border-b border-cyan-400/10 bg-slate-900/80 px-4 py-2">
+                  <span class="h-2 w-2 rounded-full bg-red-500/80"></span>
+                  <span class="h-2 w-2 rounded-full bg-yellow-500/80"></span>
+                  <span class="h-2 w-2 rounded-full bg-emerald-500/80"></span>
+                  <span class="ml-2 font-mono text-[10px] text-slate-500">attacker-ip-log · live table</span>
+                </div>
+                <iframe
+                  src="https://grafana.zwidek.pl/d-solo/adbcwkn/honeypod-map?orgId=1&from=now-6h&to=now&timezone=browser&theme=dark&panelId=panel-3&refresh=1m"
+                  width="100%" height="300" frameborder="0" loading="lazy" title="Attacker IP log table"></iframe>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── PART 2: SELF-HOSTED SERVICES ── -->
+        <div class="mt-20">
+          <h3 class="font-heading mb-8 text-xl font-semibold text-slate-100">
+            <span class="mr-2 font-mono text-sm text-cyan-400/70">►</span>Self-Hosted Services &amp; Projects
+          </h3>
+          <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+
+            <!-- Samba4 AD DC -->
+            <article class="relative flex flex-col rounded-lg border border-cyan-400/20 bg-white/5 p-5 backdrop-blur-md transition-all hover:border-cyan-400/40 hover:bg-white/[0.07] hover:shadow-[0_0_24px_rgba(34,211,238,0.08)]">
+              <div class="absolute right-4 top-4 flex items-center gap-1.5">
+                <span class="relative flex h-2 w-2">
+                  <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-50"></span>
+                  <span class="relative inline-flex h-2 w-2 rounded-full bg-emerald-400"></span>
+                </span>
+                <span class="font-mono text-[10px] text-emerald-400">ONLINE</span>
+              </div>
+              <div class="mb-4 flex h-10 w-10 items-center justify-center rounded-lg border border-cyan-400/20 bg-cyan-400/10">
+                <svg class="h-5 w-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008z" />
+                </svg>
+              </div>
+              <h4 class="font-heading pr-14 text-base font-semibold text-slate-100">Samba4 Active Directory DC</h4>
+              <p class="mt-2 flex-grow font-mono text-xs leading-relaxed text-slate-400">
+                Kontroler domeny AD uruchomiony natywnie na Linux. Zarządzanie użytkownikami, strukturą domeny i centralnymi polisami GPO.
+              </p>
+              <div class="mt-4 flex flex-wrap gap-1.5">
+                <span class="rounded border border-slate-700/60 px-1.5 py-0.5 font-mono text-[10px] text-slate-400">Linux</span>
+                <span class="rounded border border-slate-700/60 px-1.5 py-0.5 font-mono text-[10px] text-slate-400">Samba4</span>
+                <span class="rounded border border-slate-700/60 px-1.5 py-0.5 font-mono text-[10px] text-slate-400">DNS</span>
+                <span class="rounded border border-slate-700/60 px-1.5 py-0.5 font-mono text-[10px] text-slate-400">GPO</span>
+              </div>
+            </article>
+
+            <!-- Discord Bot -->
+            <article class="relative flex flex-col rounded-lg border border-cyan-400/20 bg-white/5 p-5 backdrop-blur-md transition-all hover:border-cyan-400/40 hover:bg-white/[0.07] hover:shadow-[0_0_24px_rgba(34,211,238,0.08)]">
+              <div class="absolute right-4 top-4 flex items-center gap-1.5">
+                <span class="relative flex h-2 w-2">
+                  <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-50"></span>
+                  <span class="relative inline-flex h-2 w-2 rounded-full bg-emerald-400"></span>
+                </span>
+                <span class="font-mono text-[10px] text-emerald-400">ONLINE</span>
+              </div>
+              <div class="mb-4 flex h-10 w-10 items-center justify-center rounded-lg border border-cyan-400/20 bg-cyan-400/10">
+                <svg class="h-5 w-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 01-.825-.242m9.345-8.334a2.126 2.126 0 00-.476-.095 48.64 48.64 0 00-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0011.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155" />
+                </svg>
+              </div>
+              <h4 class="font-heading pr-14 text-base font-semibold text-slate-100">Discord Automation Bot</h4>
+              <p class="mt-2 flex-grow font-mono text-xs leading-relaxed text-slate-400">
+                Zaawansowany bot zarządzający społecznością serwera studenckiego. Skonteneryzowany z naciskiem na niezawodność 24/7.
+              </p>
+              <div class="mt-4 flex flex-wrap gap-1.5">
+                <span class="rounded border border-slate-700/60 px-1.5 py-0.5 font-mono text-[10px] text-slate-400">Python</span>
+                <span class="rounded border border-slate-700/60 px-1.5 py-0.5 font-mono text-[10px] text-slate-400">Docker</span>
+                <span class="rounded border border-slate-700/60 px-1.5 py-0.5 font-mono text-[10px] text-slate-400">Discord API</span>
+              </div>
+            </article>
+
+            <!-- AI Interview Pro -->
+            <article class="relative flex flex-col rounded-lg border border-orange-400/20 bg-white/5 p-5 backdrop-blur-md transition-all hover:border-orange-400/30 hover:bg-white/[0.07] hover:shadow-[0_0_24px_rgba(251,146,60,0.07)]">
+              <div class="absolute right-4 top-4 flex items-center gap-1.5">
+                <span class="relative flex h-2 w-2">
+                  <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-orange-400 opacity-50"></span>
+                  <span class="relative inline-flex h-2 w-2 rounded-full bg-orange-400"></span>
+                </span>
+                <span class="font-mono text-[10px] text-orange-400">BUILDING</span>
+              </div>
+              <div class="mb-4 flex h-10 w-10 items-center justify-center rounded-lg border border-orange-400/20 bg-orange-400/10">
+                <svg class="h-5 w-5 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8.25 3v1.5M4.5 8.25H3m18 0h-1.5M4.5 12H3m18 0h-1.5m-15 3.75H3m18 0h-1.5M8.25 19.5V21M12 3v1.5m0 15V21m3.75-18v1.5m0 15V21m-9-1.5h10.5a2.25 2.25 0 002.25-2.25V6.75a2.25 2.25 0 00-2.25-2.25H6.75A2.25 2.25 0 004.5 6.75v10.5a2.25 2.25 0 002.25 2.25zm.75-12h9v9h-9v-9z" />
+                </svg>
+              </div>
+              <h4 class="font-heading pr-16 text-base font-semibold text-slate-100">AI Interview Pro</h4>
+              <p class="mt-2 flex-grow font-mono text-xs leading-relaxed text-slate-400">
+                Inteligentny symulator technicznych rozmów rekrutacyjnych oparty na architekturze LLM. Solidny backend i integracja API.
+              </p>
+              <div class="mt-4 flex flex-wrap gap-1.5">
+                <span class="rounded border border-slate-700/60 px-1.5 py-0.5 font-mono text-[10px] text-slate-400">Python</span>
+                <span class="rounded border border-slate-700/60 px-1.5 py-0.5 font-mono text-[10px] text-slate-400">PostgreSQL</span>
+                <span class="rounded border border-slate-700/60 px-1.5 py-0.5 font-mono text-[10px] text-slate-400">Docker</span>
+                <span class="rounded border border-slate-700/60 px-1.5 py-0.5 font-mono text-[10px] text-slate-400">LLM API</span>
+              </div>
+            </article>
+
+            <!-- Portainer & PLG Stack -->
+            <article class="relative flex flex-col rounded-lg border border-cyan-400/20 bg-white/5 p-5 backdrop-blur-md transition-all hover:border-cyan-400/40 hover:bg-white/[0.07] hover:shadow-[0_0_24px_rgba(34,211,238,0.08)]">
+              <div class="absolute right-4 top-4 flex items-center gap-1.5">
+                <span class="relative flex h-2 w-2">
+                  <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-50"></span>
+                  <span class="relative inline-flex h-2 w-2 rounded-full bg-emerald-400"></span>
+                </span>
+                <span class="font-mono text-[10px] text-emerald-400">ONLINE</span>
+              </div>
+              <div class="mb-4 flex h-10 w-10 items-center justify-center rounded-lg border border-cyan-400/20 bg-cyan-400/10">
+                <svg class="h-5 w-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6.429 9.75L2.25 12l4.179 2.25m0-4.5l5.571 3 5.571-3m-11.142 0L2.25 7.5 12 2.25l9.75 5.25-4.179 2.25m0 0L21.75 12l-4.179 2.25m0 0l4.179 2.25L12 21.75 2.25 16.5l4.179-2.25m11.142 0l-5.571 3-5.571-3" />
+                </svg>
+              </div>
+              <h4 class="font-heading pr-14 text-base font-semibold text-slate-100">Portainer CE &amp; PLG Stack</h4>
+              <p class="mt-2 flex-grow font-mono text-xs leading-relaxed text-slate-400">
+                Graficzny interfejs zarządzania kontenerami zintegrowany ze stosem monitoringu Promtail, Loki, Grafana (PLG).
+              </p>
+              <div class="mt-4 flex flex-wrap gap-1.5">
+                <span class="rounded border border-slate-700/60 px-1.5 py-0.5 font-mono text-[10px] text-slate-400">Docker</span>
+                <span class="rounded border border-slate-700/60 px-1.5 py-0.5 font-mono text-[10px] text-slate-400">Grafana</span>
+                <span class="rounded border border-slate-700/60 px-1.5 py-0.5 font-mono text-[10px] text-slate-400">Loki</span>
+                <span class="rounded border border-slate-700/60 px-1.5 py-0.5 font-mono text-[10px] text-slate-400">LogQL</span>
+              </div>
+            </article>
+
+          </div>
+        </div>
+
+        <!-- ── PART 3: INFRASTRUCTURE SPECIFICATIONS ── -->
+        <div class="mt-16 overflow-hidden rounded-lg border border-cyan-400/15 bg-slate-950/80 backdrop-blur-sm">
+          <div class="flex items-center gap-2 border-b border-cyan-400/10 bg-slate-900/60 px-5 py-3">
+            <span class="h-2.5 w-2.5 rounded-full bg-red-500/80"></span>
+            <span class="h-2.5 w-2.5 rounded-full bg-yellow-500/80"></span>
+            <span class="h-2.5 w-2.5 rounded-full bg-emerald-500/80"></span>
+            <span class="ml-3 font-mono text-xs text-slate-500">root@zwidek-core-01 ~ infrastructure.specs</span>
+          </div>
+          <div class="space-y-1 px-5 py-6 font-mono text-xs leading-relaxed sm:text-sm">
+            <p>
+              <span class="text-cyan-400">const</span>
+              <span class="text-slate-200"> owner </span>
+              <span class="text-slate-500">= </span>
+              <span class="text-emerald-400">"Maksymilian Frankowski"</span>
+              <span class="text-slate-500">; </span>
+              <span class="text-slate-600">// Bare-metal Infrastructure</span>
+            </p>
+            <p class="pt-2 text-slate-600">// ─── Hardware &amp; Network ─────────────────────────────</p>
+            <p><span class="w-20 inline-block text-slate-500">host</span><span class="text-slate-300">zwidek-core-01</span></p>
+            <p><span class="w-20 inline-block text-slate-500">provider</span><span class="text-slate-300">Hetzner Cloud</span></p>
+            <p><span class="w-20 inline-block text-slate-500">os</span><span class="text-slate-300">Ubuntu 24.04 LTS</span></p>
+            <p class="pt-2 text-slate-600">// ─── Security Layers ────────────────────────────────</p>
+            <p><span class="w-20 inline-block text-slate-500">edge</span><span class="text-slate-300">Cloudflare CDN &amp; DDoS Protection</span></p>
+            <p>
+              <span class="w-20 inline-block text-slate-500">tunnel</span>
+              <span class="text-emerald-400">Encrypted Cloudflare Tunnel</span>
+              <span class="text-slate-600"> // no exposed ports</span>
+            </p>
+            <p>
+              <span class="w-20 inline-block text-slate-500">firewall</span>
+              <span class="text-emerald-400">UFW &amp; Fail2Ban</span>
+              <span class="text-slate-600"> // automated IPS</span>
+            </p>
+            <p class="pt-3">
+              <span class="text-cyan-400/60">$</span>
+              <span class="text-slate-500"> systemctl is-active --all | grep active | wc -l</span>
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
     <!-- CONTACT -->
     <section id="contact" class="fade-section border-t border-cyan-400/10 px-6 py-24">
       <div class="mx-auto max-w-3xl text-center">
         <div class="flex items-center justify-center gap-4">
           <span class="h-px flex-1 max-w-[4rem] bg-cyan-400/30 sm:max-w-[6rem]"></span>
-          <p class="font-mono text-xs tracking-widest text-cyan-400">05 // CONTACT</p>
+          <p class="font-mono text-xs tracking-widest text-cyan-400">06 // CONTACT</p>
           <span class="h-px flex-1 max-w-[4rem] bg-cyan-400/30 sm:max-w-[6rem]"></span>
         </div>
         <h2 class="font-heading mt-8 text-4xl font-bold text-slate-100 sm:text-5xl">Let's connect.</h2>
