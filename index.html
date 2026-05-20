@@ -272,46 +272,84 @@
         <p class="font-mono text-xs text-cyan-400">03 // PROJECTS</p>
         <h2 class="font-heading mt-2 text-3xl font-bold text-slate-100 sm:text-4xl">Active Deployments</h2>
         <div class="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          <!-- Project 1 -->
+          <!-- Project 1 — Aegis -->
           <article class="flex flex-col rounded-lg border border-cyan-400/20 bg-white/5 p-6 backdrop-blur-md transition-all hover:border-cyan-400/40 hover:bg-white/[0.07] sm:p-8">
-            <div class="mb-4 font-mono text-xs text-cyan-400/70">PRJ-001</div>
+            <div class="mb-4 flex items-center justify-between">
+              <span class="font-mono text-xs text-cyan-400/70">PRJ-001</span>
+              <span class="rounded-full border border-cyan-400/30 bg-cyan-400/10 px-2 py-0.5 font-mono text-[10px] text-cyan-400">FEATURED</span>
+            </div>
+            <h3 class="font-heading text-xl font-semibold text-slate-100">Aegis Anti-Bot System</h3>
+            <p class="mt-3 flex-grow font-mono text-sm leading-relaxed text-slate-400">
+              Production-grade bot mitigation: browser fingerprinting via <span class="text-slate-300">Rust/WASM</span> (Canvas, WebGL, CPU jitter), behavioral analysis, and a risk-scoring pipeline targeting &lt;5ms latency.
+            </p>
+            <div class="mt-6 flex flex-wrap gap-2">
+              <span class="rounded border border-cyan-400/30 bg-cyan-400/5 px-2 py-0.5 font-mono text-xs text-cyan-400">FastAPI</span>
+              <span class="rounded border border-cyan-400/30 bg-cyan-400/5 px-2 py-0.5 font-mono text-xs text-cyan-400">Rust/WASM</span>
+              <span class="rounded border border-cyan-400/30 bg-cyan-400/5 px-2 py-0.5 font-mono text-xs text-cyan-400">Redis</span>
+              <span class="rounded border border-cyan-400/30 bg-cyan-400/5 px-2 py-0.5 font-mono text-xs text-cyan-400">ClickHouse</span>
+            </div>
+            <a href="https://github.com/Zwidek12" target="_blank" rel="noopener noreferrer" class="mt-6 inline-flex items-center gap-1 font-mono text-sm text-cyan-400 transition-colors hover:text-cyan-300">
+              View Code →
+            </a>
+          </article>
+          <!-- Project 2 — Discord Bot -->
+          <article class="flex flex-col rounded-lg border border-cyan-400/20 bg-white/5 p-6 backdrop-blur-md transition-all hover:border-cyan-400/40 hover:bg-white/[0.07] sm:p-8">
+            <div class="mb-4 font-mono text-xs text-cyan-400/70">PRJ-002</div>
+            <h3 class="font-heading text-xl font-semibold text-slate-100">Discord Bot — WSB Merito</h3>
+            <p class="mt-3 flex-grow font-mono text-sm leading-relaxed text-slate-400">
+              Discord bot managing a student point system with Excel integration, automated ticket handling, and role-based admin commands.
+            </p>
+            <div class="mt-6 flex flex-wrap gap-2">
+              <span class="rounded border border-cyan-400/30 bg-cyan-400/5 px-2 py-0.5 font-mono text-xs text-cyan-400">Python</span>
+              <span class="rounded border border-cyan-400/30 bg-cyan-400/5 px-2 py-0.5 font-mono text-xs text-cyan-400">discord.py</span>
+              <span class="rounded border border-cyan-400/30 bg-cyan-400/5 px-2 py-0.5 font-mono text-xs text-cyan-400">pandas</span>
+            </div>
+            <a href="https://github.com/Zwidek12" target="_blank" rel="noopener noreferrer" class="mt-6 inline-flex items-center gap-1 font-mono text-sm text-cyan-400 transition-colors hover:text-cyan-300">
+              View Code →
+            </a>
+          </article>
+          <!-- Project 3 — Jarvis -->
+          <article class="flex flex-col rounded-lg border border-cyan-400/20 bg-white/5 p-6 backdrop-blur-md transition-all hover:border-cyan-400/40 hover:bg-white/[0.07] sm:p-8">
+            <div class="mb-4 font-mono text-xs text-cyan-400/70">PRJ-003</div>
+            <h3 class="font-heading text-xl font-semibold text-slate-100">Jarvis Voice Assistant</h3>
+            <p class="mt-3 flex-grow font-mono text-sm leading-relaxed text-slate-400">
+              Wake-word "Zwidek" → Whisper STT → GPT-4o-mini with tool calls → ElevenLabs TTS. Modular architecture with a custom CLI and URL allowlist.
+            </p>
+            <div class="mt-6 flex flex-wrap gap-2">
+              <span class="rounded border border-cyan-400/30 bg-cyan-400/5 px-2 py-0.5 font-mono text-xs text-cyan-400">Python</span>
+              <span class="rounded border border-cyan-400/30 bg-cyan-400/5 px-2 py-0.5 font-mono text-xs text-cyan-400">OpenAI Whisper</span>
+              <span class="rounded border border-cyan-400/30 bg-cyan-400/5 px-2 py-0.5 font-mono text-xs text-cyan-400">ElevenLabs</span>
+            </div>
+            <a href="https://github.com/Zwidek12" target="_blank" rel="noopener noreferrer" class="mt-6 inline-flex items-center gap-1 font-mono text-sm text-cyan-400 transition-colors hover:text-cyan-300">
+              View Code →
+            </a>
+          </article>
+          <!-- Project 4 — AI Interview -->
+          <article class="flex flex-col rounded-lg border border-cyan-400/20 bg-white/5 p-6 backdrop-blur-md transition-all hover:border-cyan-400/40 hover:bg-white/[0.07] sm:p-8">
+            <div class="mb-4 font-mono text-xs text-cyan-400/70">PRJ-004</div>
             <h3 class="font-heading text-xl font-semibold text-slate-100">AI Interview Pro</h3>
             <p class="mt-3 flex-grow font-mono text-sm leading-relaxed text-slate-400">
-              A system simulating technical interviews using AI — practice scenarios, real-time feedback, and adaptive difficulty.
+              A system simulating technical interviews using AI — adaptive difficulty, real-time feedback, and scenario generation via LLM API.
             </p>
             <div class="mt-6 flex flex-wrap gap-2">
               <span class="rounded border border-cyan-400/30 bg-cyan-400/5 px-2 py-0.5 font-mono text-xs text-cyan-400">Python</span>
               <span class="rounded border border-cyan-400/30 bg-cyan-400/5 px-2 py-0.5 font-mono text-xs text-cyan-400">LLM API</span>
             </div>
             <a href="https://github.com/Zwidek12" target="_blank" rel="noopener noreferrer" class="mt-6 inline-flex items-center gap-1 font-mono text-sm text-cyan-400 transition-colors hover:text-cyan-300">
-              View Code <span class="transition-transform group-hover:translate-x-1">→</span>
-            </a>
-          </article>
-          <!-- Project 2 -->
-          <article class="flex flex-col rounded-lg border border-cyan-400/20 bg-white/5 p-6 backdrop-blur-md transition-all hover:border-cyan-400/40 hover:bg-white/[0.07] sm:p-8">
-            <div class="mb-4 font-mono text-xs text-cyan-400/70">PRJ-002</div>
-            <h3 class="font-heading text-xl font-semibold text-slate-100">Jarvis Voice Assistant</h3>
-            <p class="mt-3 flex-grow font-mono text-sm leading-relaxed text-slate-400">
-              Custom voice assistant with wake-word detection and deep system integration for hands-free control.
-            </p>
-            <div class="mt-6 flex flex-wrap gap-2">
-              <span class="rounded border border-cyan-400/30 bg-cyan-400/5 px-2 py-0.5 font-mono text-xs text-cyan-400">Python</span>
-              <span class="rounded border border-cyan-400/30 bg-cyan-400/5 px-2 py-0.5 font-mono text-xs text-cyan-400">Audio Processing</span>
-            </div>
-            <a href="https://github.com/Zwidek12" target="_blank" rel="noopener noreferrer" class="mt-6 inline-flex items-center gap-1 font-mono text-sm text-cyan-400 transition-colors hover:text-cyan-300">
               View Code →
             </a>
           </article>
-          <!-- Project 3 -->
+          <!-- Project 5 — Homelab -->
           <article class="flex flex-col rounded-lg border border-cyan-400/20 bg-white/5 p-6 backdrop-blur-md transition-all hover:border-cyan-400/40 hover:bg-white/[0.07] sm:p-8 md:col-span-2 lg:col-span-1">
-            <div class="mb-4 font-mono text-xs text-cyan-400/70">PRJ-003</div>
+            <div class="mb-4 font-mono text-xs text-cyan-400/70">PRJ-005</div>
             <h3 class="font-heading text-xl font-semibold text-slate-100">Enterprise Homelab</h3>
             <p class="mt-3 flex-grow font-mono text-sm leading-relaxed text-slate-400">
-              Automated deployment of reverse proxies, container orchestration, and network monitoring on bare-metal &amp; cloud.
+              Self-hosted cloud infrastructure on Hetzner: automated deployment of reverse proxies, container orchestration, and network monitoring.
             </p>
             <div class="mt-6 flex flex-wrap gap-2">
               <span class="rounded border border-cyan-400/30 bg-cyan-400/5 px-2 py-0.5 font-mono text-xs text-cyan-400">Docker</span>
               <span class="rounded border border-cyan-400/30 bg-cyan-400/5 px-2 py-0.5 font-mono text-xs text-cyan-400">Linux</span>
+              <span class="rounded border border-cyan-400/30 bg-cyan-400/5 px-2 py-0.5 font-mono text-xs text-cyan-400">Cloudflare</span>
             </div>
             <a href="https://github.com/Zwidek12" target="_blank" rel="noopener noreferrer" class="mt-6 inline-flex items-center gap-1 font-mono text-sm text-cyan-400 transition-colors hover:text-cyan-300">
               View Code →
