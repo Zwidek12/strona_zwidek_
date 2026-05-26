@@ -116,6 +116,29 @@
       color: #f8fafc;
     }
 
+    /* ── Fix 1: iOS Safari header backdrop ── */
+    #site-header {
+      -webkit-backdrop-filter: blur(12px);
+      backdrop-filter: blur(12px);
+      background-color: rgba(2, 6, 23, 0.85);
+    }
+
+    /* ── Fix 3: smooth mobile menu ── */
+    #mobile-menu {
+      display: block;
+      overflow: hidden;
+      max-height: 0;
+      opacity: 0;
+      transform: translateY(-8px);
+      transition: max-height 0.32s ease-in-out, opacity 0.25s ease-in-out, transform 0.25s ease-in-out;
+    }
+
+    #mobile-menu.menu-open {
+      max-height: 400px;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
     .iframe-panel {
       transition: box-shadow 0.35s ease;
     }
@@ -145,8 +168,8 @@
   </div>
 
   <!-- NAV -->
-  <header
-    class="fixed top-0 left-0 right-0 z-40 border-b border-cyan-400/10 bg-slate-950/80 backdrop-blur-md animate-fade-in">
+  <header id="site-header"
+    class="fixed top-0 left-0 right-0 z-50 border-b border-cyan-400/10 animate-fade-in">
     <nav class="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
       <a href="#" class="group flex items-center gap-3" aria-label="Zwidek — home">
         <span
@@ -178,7 +201,7 @@
         </svg>
       </button>
     </nav>
-    <div id="mobile-menu" class="hidden border-t border-cyan-400/10 bg-slate-950/95 px-6 py-4 sm:hidden">
+    <div id="mobile-menu" class="border-t border-cyan-400/10 bg-slate-950/95 px-6 py-4 sm:hidden">
       <ul class="flex flex-col gap-4 font-mono text-xs uppercase tracking-wider">
         <li><a href="#about" class="block py-1 text-slate-400 hover:text-cyan-400">About</a></li>
         <li><a href="#stack" class="block py-1 text-slate-400 hover:text-cyan-400">Stack</a></li>
@@ -223,9 +246,9 @@
             <span class="transition-transform group-hover:translate-x-1">→</span>
           </a>
           <a href="https://github.com/Zwidek12" target="_blank" rel="noopener noreferrer"
-            class="inline-flex items-center gap-2 rounded border border-slate-600 px-6 py-3 font-mono text-sm text-slate-300 transition-all hover:border-slate-400 hover:bg-white/5 hover:text-slate-100">
+            class="group inline-flex items-center gap-2 rounded border border-slate-600 px-6 py-3 font-mono text-sm text-slate-300 transition-all hover:border-slate-400 hover:bg-white/5 hover:text-slate-100">
             GitHub
-            <span>→</span>
+            <span class="transition-transform group-hover:translate-x-1">→</span>
           </a>
         </div>
         <div class="mt-20 flex items-center gap-3 font-mono text-xs text-slate-600">
@@ -501,6 +524,34 @@
             </div>
             <a href="cybersec-report.html"
               class="mt-6 inline-flex items-center gap-1 font-mono text-sm text-red-400 transition-colors hover:text-red-300">
+              View Report →
+            </a>
+          </article>
+          <!-- Project 7 — Blue Team WAF -->
+          <article
+            class="flex flex-col rounded-lg border border-emerald-500/20 bg-white/5 p-6 backdrop-blur-md transition-all hover:border-emerald-500/40 hover:bg-white/[0.07] hover:shadow-[0_0_28px_rgba(52,211,153,0.07)] sm:p-8 md:col-span-2 lg:col-span-1">
+            <div class="mb-4 flex items-center justify-between">
+              <span class="font-mono text-xs text-emerald-400/70">PRJ-007</span>
+              <span
+                class="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 font-mono text-[10px] text-emerald-400">BLUE TEAM</span>
+            </div>
+            <h3 class="font-heading text-xl font-semibold text-slate-100">Defensive WAF — ModSecurity</h3>
+            <p class="mt-3 flex-grow font-mono text-sm leading-relaxed text-slate-400">
+              Architektura obronna Reverse Proxy: <span class="text-slate-300">Nginx + ModSecurity + OWASP CRS</span>
+              blokująca ataki SQLi z Red Team Assessment. 147 żądań sqlmap zablokowanych, 0 danych ujawnionych.
+            </p>
+            <div class="mt-6 flex flex-wrap gap-2">
+              <span
+                class="rounded border border-emerald-500/30 bg-emerald-500/5 px-2 py-0.5 font-mono text-xs text-emerald-400">Nginx</span>
+              <span
+                class="rounded border border-emerald-500/30 bg-emerald-500/5 px-2 py-0.5 font-mono text-xs text-emerald-400">ModSecurity</span>
+              <span
+                class="rounded border border-emerald-500/30 bg-emerald-500/5 px-2 py-0.5 font-mono text-xs text-emerald-400">OWASP CRS</span>
+              <span
+                class="rounded border border-slate-700/50 bg-slate-800/50 px-2 py-0.5 font-mono text-xs text-slate-400">Docker</span>
+            </div>
+            <a href="blue-team-waf.html"
+              class="mt-6 inline-flex items-center gap-1 font-mono text-sm text-emerald-400 transition-colors hover:text-emerald-300">
               View Report →
             </a>
           </article>
@@ -911,11 +962,11 @@
       const mobileMenu = document.getElementById('mobile-menu');
       if (menuBtn && mobileMenu) {
         menuBtn.addEventListener('click', function () {
-          mobileMenu.classList.toggle('hidden');
+          mobileMenu.classList.toggle('menu-open');
         });
         mobileMenu.querySelectorAll('a').forEach(function (link) {
           link.addEventListener('click', function () {
-            mobileMenu.classList.add('hidden');
+            mobileMenu.classList.remove('menu-open');
           });
         });
       }
